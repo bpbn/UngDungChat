@@ -5,14 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
-    tools:context=".MainActivity">
+    tools:context=".Activity.MainActivity">
 
-    <include
-        android:id="@+id/main_page_toolbar"
-        layout="@layout/app_bar_layout"
-        >
 
-    </include>
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/main_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/main_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        </com.google.android.material.tabs.TabLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+    
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/main_tabs_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appBarLayout">
+
+    </androidx.viewpager2.widget.ViewPager2>
 
 </RelativeLayout>
