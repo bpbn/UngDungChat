@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
 
-    private androidx.appcompat.widget.Toolbar mToolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,12 +28,15 @@ public class MainActivity extends AppCompatActivity {
             switch (position){
                 case 0:
                     tab.setText("Tin nhắn");
+                    getSupportActionBar().setTitle("Tin nhắn");
                     break;
                 case 1:
                     tab.setText("Nhóm");
+                    getSupportActionBar().setTitle("Nhóm");
                     break;
                 case 2:
                     tab.setText("Liên hệ");
+                    getSupportActionBar().setTitle("Liên hệ");
                     break;
             }
         }).attach();
