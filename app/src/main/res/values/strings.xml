@@ -2,4 +2,20 @@
     <string name="app_name">UngDungChat</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">LOGIN</string>
+    <string name="register">REGISTER</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="need_new_account">Need new Account?</string>
+    <string name="or_login_using_your">or login using your</string>
+    <string name="phone">PHONE</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_have_an_account">Already have an Account?</string>
+    <string name="find_friends">Find Friends</string>
+    <string name="setting">Setting</string>
+    <string name="logout">Logout</string>
+    <string name="username">Username</string>
+    <string name="status_profile">Status Profile</string>
+    <string name="update">UPDATE</string>
 </resources>
