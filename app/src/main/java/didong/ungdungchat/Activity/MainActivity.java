@@ -132,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    private void sendUserToFindFriendsActivity() {
+        Intent intent = new Intent(MainActivity.this, FindFriendsActivity.class);
+        startActivity(intent);
+        finish();
+    }
     private void sendUserToSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -231,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(item.getItemId() == R.id.main_find_friends_option)
         {
-
+            sendUserToFindFriendsActivity();
         }
         return true;
     }
