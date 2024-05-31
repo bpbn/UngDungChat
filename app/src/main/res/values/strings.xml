@@ -18,4 +18,5 @@
     <string name="username">Username</string>
     <string name="status_profile">Status Profile</string>
     <string name="update">UPDATE</string>
+    <string name="user_status">user status</string>
 </resources>
