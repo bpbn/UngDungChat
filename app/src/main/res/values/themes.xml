@@ -9,4 +9,9 @@
     </style>
 
     <style name="Theme.UngDungChat" parent="Base.Theme.UngDungChat" />
+
+    <style name="ThemeOverlay.PopupTheme" parent="Theme.AppCompat.Light" >
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
 </resources>

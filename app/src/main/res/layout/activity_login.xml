@@ -45,9 +45,9 @@
             android:id="@+id/login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:drawableStart="@drawable/pw"
-            android:hint="@string/password" />
+            android:drawableStart="@drawable/baseline_lock_24"
+            android:hint="@string/password"
+            android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

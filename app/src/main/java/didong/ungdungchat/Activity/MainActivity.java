@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
 
         getMenuInflater().inflate(R.menu.option_menu, menu);
-
         return true;
     }
 
