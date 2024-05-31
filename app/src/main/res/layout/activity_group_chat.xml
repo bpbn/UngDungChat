@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.PopupTheme"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <ScrollView
@@ -24,7 +24,7 @@
         android:layout_above="@+id/group_chat_linear_layout">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -50,9 +50,10 @@
 
         <EditText
             android:id="@+id/input_group_message"
-            android:layout_width="320dp"
+            android:layout_width="330dp"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_design"
+            android:textCursorDrawable="@drawable/color_cursor"
             android:hint="Type a message..."
             android:padding="18dp" />
 
@@ -61,6 +62,8 @@
             android:layout_width="55dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@drawable/baseline_send_24" />
+            android:src="@drawable/baseline_send_24"
+            android:background="@null"
+            app:tint="@color/colorPrimary" />
     </LinearLayout>
 </RelativeLayout>

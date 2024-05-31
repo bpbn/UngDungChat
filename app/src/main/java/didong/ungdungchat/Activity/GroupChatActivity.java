@@ -83,6 +83,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
                 if (keypadHeight > screenHeight * 0.15) {
                     binding.main.setPadding(0, 0, 0, keypadHeight);
+                    binding.myScrollView.post(() -> binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN));
                 } else {
                     binding.main.setPadding(0, 0, 0, 0);
                 }
@@ -181,7 +182,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     String chatTime = dataSnapshot.child("time").getValue(String.class);
 
                     if(chatMessage != null && chatDate != null && chatName != null && chatTime != null){
-                        binding.groupChatTextDisplay.append(chatName + ":\n" + chatMessage + "\n" + chatTime + "       " + chatDate + "\n\n\n");
+                        binding.groupChatTextDisplay.append(chatName + ":\n" + chatMessage + "\n" + chatTime + "       " + chatDate + "\n\n");
                     }
                 }
                 binding.myScrollView.post(() -> binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN));
