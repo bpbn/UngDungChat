@@ -1,16 +1,21 @@
 package didong.ungdungchat.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        RootRef = FirebaseDatabase.getInstance().getReference("Users");
-
+        RootRef = FirebaseDatabase.getInstance().getReference();
 
         binding.mainTabsPager.setAdapter(new TabsAccessorAdapter(this));
         new TabLayoutMediator(binding.mainTabs, binding.mainTabsPager, (tab, position) -> {
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private void VerifyUserExistance() {
         String currentUserId = mAuth.getCurrentUser().getUid();
 
-        RootRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
+        RootRef.child("Users").child(currentUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists())
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                     if(snapshot.child("name").exists())
                     {
                         Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-                    }
+                     }
                     else
                     {
                         sendUserToSettingActivity();
@@ -131,6 +135,49 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    private void RequestNewGroup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
+        builder.setTitle("Enter Group Name: ");
+
+        final EditText groupNameField = new EditText(MainActivity.this);
+        groupNameField.setHint("e.g Coding Cafe");
+        builder.setView(groupNameField);
+
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String groupName = groupNameField.getText().toString();
+                if(TextUtils.isEmpty(groupName)){
+                    Toast.makeText(MainActivity.this, "Please write Group Name", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    CreateNewGroup(groupName);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void CreateNewGroup(String groupName) {
+        RootRef.child("Groups").child(groupName).setValue("")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(MainActivity.this,groupName + " group is Created Successful",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -152,11 +199,17 @@ public class MainActivity extends AppCompatActivity {
         {
             sendUserToSettingActivity();
         }
+        if(item.getItemId() == R.id.main_create_groups_option)
+        {
+            RequestNewGroup();
+        }
         if(item.getItemId() == R.id.main_find_friends_option)
         {
 
         }
         return true;
     }
+
+
 
 }

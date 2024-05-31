@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -88,6 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
                             {
                                 String error = task.getException().toString();
                                 Toast.makeText(RegisterActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                                Log.d("", error);
                                 loading.dismiss();
                             }
                         }
