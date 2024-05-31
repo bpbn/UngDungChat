@@ -9,6 +9,12 @@
         app:showAsAction="never"
         />
 
+    <item
+        android:id="@+id/main_create_groups_option"
+        android:title="@string/create_groups"
+        app:showAsAction="never"
+        />
+
 
     <item
         android:id="@+id/main_setting_option"
