@@ -72,6 +72,22 @@ public class GroupChatActivity extends AppCompatActivity {
                 binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+
+        binding.main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                binding.main.getWindowVisibleDisplayFrame(r);
+                int screenHeight = binding.main.getRootView().getHeight();
+                int keypadHeight = screenHeight - r.bottom;
+
+                if (keypadHeight > screenHeight * 0.15) {
+                    binding.main.setPadding(0, 0, 0, keypadHeight);
+                } else {
+                    binding.main.setPadding(0, 0, 0, 0);
+                }
+            }
+        });
     }
 
     @Override
@@ -118,7 +134,6 @@ public class GroupChatActivity extends AppCompatActivity {
                     currentUserName = snapshot.child("name").getValue().toString();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -153,17 +168,30 @@ public class GroupChatActivity extends AppCompatActivity {
 
         }
     }
+
     private void DisplayMessage(DataSnapshot snapshot) {
-        Iterator iterator = snapshot.getChildren().iterator();
-        while (iterator.hasNext()){
-            String chatDate = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatMessage = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatName = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatTime = (String) ((DataSnapshot)iterator.next()).getValue();
+        GroupNameRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                binding.groupChatTextDisplay.setText("");
+                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                    String chatDate = dataSnapshot.child("date").getValue(String.class);
+                    String chatMessage = dataSnapshot.child("message").getValue(String.class);
+                    String chatName = dataSnapshot.child("name").getValue(String.class);
+                    String chatTime = dataSnapshot.child("time").getValue(String.class);
 
-            binding.groupChatTextDisplay.append(chatName + ":\n" + chatMessage + "\n" + chatTime + "       " + chatDate + "\n\n\n");
+                    if(chatMessage != null && chatDate != null && chatName != null && chatTime != null){
+                        binding.groupChatTextDisplay.append(chatName + ":\n" + chatMessage + "\n" + chatTime + "       " + chatDate + "\n\n\n");
+                    }
+                }
+                binding.myScrollView.post(() -> binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN));
+            }
 
-            binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
+
 }

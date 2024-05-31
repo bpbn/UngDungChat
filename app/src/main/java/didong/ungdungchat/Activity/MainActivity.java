@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
-    private DatabaseReference RootRef;
+    private DatabaseReference RootRef, GroupRef;
+    private String currentUserID, currentUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
+        currentUserID = mAuth.getCurrentUser().getUid();
         RootRef = FirebaseDatabase.getInstance().getReference();
 
         binding.mainTabsPager.setAdapter(new TabsAccessorAdapter(this));
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        GetUserInfo();
     }
     @Override
     protected void onStart() {
@@ -171,17 +174,40 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void GetUserInfo() {
+        RootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    currentUserName = snapshot.child("name").getValue().toString();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void CreateNewGroup(String groupName) {
-        RootRef.child("Groups").child(groupName).setValue("")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+         GroupRef = RootRef.child("Groups").child(groupName);
+         GroupRef.setValue("").addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(MainActivity.this,groupName + " group is Created Successful",Toast.LENGTH_SHORT).show();
+                            GroupRef.child("members").child(currentUserID).setValue(currentUserName)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Toast.makeText(MainActivity.this,groupName + " group is Created Successful",Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                         }
                     }
                 });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -214,7 +240,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
 
 }
