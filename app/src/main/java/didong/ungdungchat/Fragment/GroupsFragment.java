@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,10 +34,9 @@ public class GroupsFragment extends Fragment {
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> listGroup = new ArrayList<>();
     private DatabaseReference GroupRef;
-    public GroupsFragment() {
-        // Required empty public constructor
-
-    }
+    private FirebaseAuth mAuth;
+    private String currentUserID;
+    public GroupsFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,6 +44,7 @@ public class GroupsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
         binding = FragmentGroupsBinding.bind(view);
 
+        mAuth = FirebaseAuth.getInstance();
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         IntializeFields();
         RetrieveAndDisplayGroup();
@@ -65,16 +66,16 @@ public class GroupsFragment extends Fragment {
         binding.listGroups.setAdapter(arrayAdapter);
     }
     private void RetrieveAndDisplayGroup() {
+        currentUserID = mAuth.getCurrentUser().getUid();
         GroupRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Set<String> set = new HashSet<>();
-                Iterator iterator = snapshot.getChildren().iterator();
-                while (iterator.hasNext()){
-                    set.add(((DataSnapshot) iterator.next()).getKey());
-                }
                 listGroup.clear();
-                listGroup.addAll(set);
+                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                    if (dataSnapshot.child("members").child(currentUserID).exists()) {
+                        listGroup.add(dataSnapshot.getKey());
+                    }
+                }
                 arrayAdapter.notifyDataSetChanged();
             }
 
