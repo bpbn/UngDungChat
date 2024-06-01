@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Snapshot", snapshot.toString());
                     if(snapshot.child("name").exists())
                     {
-                        Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
                      }
                     else
                     {
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendUserToFindFriendsActivity() {
         Intent intent = new Intent(MainActivity.this, FindFriendsActivity.class);
         startActivity(intent);
-        finish();
+//        finish();
     }
     private void sendUserToSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
