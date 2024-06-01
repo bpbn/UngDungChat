@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        currentUserID = mAuth.getCurrentUser().getUid();
+        //currentUserID = mAuth.getCurrentUser().getUid();
         RootRef = FirebaseDatabase.getInstance().getReference();
 
         binding.mainTabsPager.setAdapter(new TabsAccessorAdapter(this));
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        GetUserInfo();
+
     }
     @Override
     protected void onStart() {
@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
+            GetUserInfo();
             VerifyUserExistance();
         }
     }
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void GetUserInfo() {
+        currentUserID = currentUser.getUid();
         RootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
