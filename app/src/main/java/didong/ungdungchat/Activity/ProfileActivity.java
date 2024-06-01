@@ -157,11 +157,41 @@ public class ProfileActivity extends AppCompatActivity {
                     if (Current_State.equals("request_received")){
                         AcceptChatRequest();
                     }
+                    if (Current_State.equals("friends")){
+                        RemoveSpecificContact();
+                    }
                 }
             });
         }else {
             binding.sendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void RemoveSpecificContact() {
+        ContactsRef.child(senderUserID).child(receiverUserID)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            ContactsRef.child(senderUserID).child(receiverUserID)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                binding.sendMessageRequestButton.setEnabled(true);
+                                                Current_State = "new";
+                                                binding.sendMessageRequestButton.setText("Send Message");
+
+                                                binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                binding.declineMessageRequestButton.setEnabled(false);
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
     }
 
     private void AcceptChatRequest() {
