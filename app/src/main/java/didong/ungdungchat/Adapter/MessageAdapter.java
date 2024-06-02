@@ -23,6 +23,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import didong.ungdungchat.Model.Messages;
 import didong.ungdungchat.R;
+import didong.ungdungchat.databinding.CustomMessagesLayoutBinding;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
     private List<Messages> userMessagesList;
@@ -44,7 +45,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         mAuth = FirebaseAuth.getInstance();
 
-        return new MessageViewHolder(view);
+        return new MessageViewHolder(CustomMessagesLayoutBinding.bind(view));
     }
 
 
@@ -77,11 +78,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             }
         });
-
-
-
-
-
         messageViewHolder.receiverMessageText.setVisibility(View.GONE);
         messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
         messageViewHolder.senderMessageText.setVisibility(View.GONE);
@@ -129,15 +125,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public ImageView messageSenderPicture, messageReceiverPicture;
 
 
-        public MessageViewHolder(@NonNull View itemView)
+        public MessageViewHolder(@NonNull CustomMessagesLayoutBinding itemView)
         {
-            super(itemView);
+            super(itemView.getRoot());
 
-            senderMessageText = (TextView) itemView.findViewById(R.id.sender_messsage_text);
-            receiverMessageText = (TextView) itemView.findViewById(R.id.receiver_message_text);
-            receiverProfileImage = (CircleImageView) itemView.findViewById(R.id.message_profile_image);
-            messageReceiverPicture = itemView.findViewById(R.id.message_receiver_image_view);
-            messageSenderPicture = itemView.findViewById(R.id.message_sender_image_view);
+            senderMessageText = itemView.senderMesssageText;
+            receiverMessageText = itemView.receiverMessageText;
+            receiverProfileImage = itemView.messageProfileImage;
+            messageReceiverPicture = itemView.messageReceiverImageView;
+            messageSenderPicture = itemView.messageSenderImageView;
         }
     }
 

@@ -9,7 +9,7 @@
     tools:context=".Activity.ChatActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chat_toolbar"
+        android:id="@+id/tbChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -22,7 +22,7 @@
         android:id="@+id/private_messages_list_of_users"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/chat_toolbar"
+        android:layout_below="@+id/tbChat"
         android:layout_above="@+id/chat_linear_layout"
         android:layout_marginBottom="6dp"
         >
@@ -41,7 +41,7 @@
 
 
         <ImageButton
-            android:id="@+id/send_files_btn"
+            android:id="@+id/btnSendFile"
             android:layout_width="60dp"
             android:layout_height="50dp"
             android:src="@drawable/baseline_file_upload_24"
@@ -51,19 +51,19 @@
 
 
         <EditText
-            android:id="@+id/input_message"
+            android:id="@+id/tvMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="type message here..."
             android:padding="15dp"
             android:maxLines="5"
-            android:layout_toEndOf="@+id/send_files_btn"
-            android:layout_toStartOf="@+id/send_message_btn"
+            android:layout_toEndOf="@+id/btnSendFile"
+            android:layout_toStartOf="@+id/btnSendMessage"
             />
 
 
         <ImageButton
-            android:id="@+id/send_message_btn"
+            android:id="@+id/btnSendMessage"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_send_24"

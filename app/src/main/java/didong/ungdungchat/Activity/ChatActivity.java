@@ -2,10 +2,12 @@ package didong.ungdungchat.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -52,6 +54,8 @@ public class ChatActivity extends AppCompatActivity {
     ActivityChatBinding binding;
     CustomChatBarBinding customChatBarBinding;
 
+    boolean isKeyboardShowing = false;
+
     private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
@@ -87,7 +91,7 @@ public class ChatActivity extends AppCompatActivity {
         Picasso.get().load(messageReceiverImage).placeholder(R.drawable.baseline_account_circle_24).into(customChatBarBinding.customProfileImage);
 
 
-        binding.sendMessageBtn.setOnClickListener(new View.OnClickListener() {
+        binding.btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view)
             {
@@ -98,6 +102,35 @@ public class ChatActivity extends AppCompatActivity {
 
         DisplayLastSeen();
         Objects.requireNonNull(getSupportActionBar()).setTitle("");
+
+        binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        Rect r = new Rect();
+                        binding.getRoot().getWindowVisibleDisplayFrame(r);
+                        int screenHeight = binding.getRoot().getRootView().getHeight();
+
+                        // r.bottom is the position above soft keypad or device button.
+                        // if keypad is shown, the r.bottom is smaller than that before.
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                            // keyboard is opened
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+                            }
+                        }
+                        else {
+                            // keyboard is closed
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                            }
+                        }
+                    }
+                });
     }
 
 
@@ -105,7 +138,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void IntializeControllers()
     {
-        setSupportActionBar(binding.chatToolbar);
+        setSupportActionBar(binding.tbChat);
 
         ActionBar actionBar = getSupportActionBar();
 //        Objects.requireNonNull(actionBar).setDisplayHomeAsUpEnabled(true);
@@ -217,7 +250,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void SendMessage()
     {
-        String messageText = binding.inputMessage.getText().toString().trim();
+        String messageText = binding.tvMessage.getText().toString().trim();
 
         if (TextUtils.isEmpty(messageText))
         {
@@ -255,7 +288,7 @@ public class ChatActivity extends AppCompatActivity {
                 {
                     Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
                 }
-                binding.inputMessage.setText("");
+                binding.tvMessage.setText("");
             });
         }
     }
