@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     tab.setText("Liên hệ");
                     break;
+                case 3:
+                    tab.setText("Yêu cầu");
+                    break;
             }
         }).attach();
         binding.mainTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
