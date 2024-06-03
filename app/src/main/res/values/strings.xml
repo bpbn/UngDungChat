@@ -10,6 +10,10 @@
     <string name="need_new_account">Need new Account?</string>
     <string name="or_login_using_your">or login using your</string>
     <string name="phone">PHONE</string>
+    <string name="verify">Write Verification Code</string>
+    <string name="send_verify">Send Verification Code</string>
+    <string name="send_verify_again">Verify</string>
+    <string name="text_phone">Write Phone Number</string>
     <string name="create_account">Create Account</string>
     <string name="already_have_an_account">Already have an Account?</string>
     <string name="find_friends">Find Friends</string>
