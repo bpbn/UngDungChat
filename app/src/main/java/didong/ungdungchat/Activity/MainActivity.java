@@ -94,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            GetUserInfo();
             VerifyUserExistance();
+            GetUserInfo();
         }
     }
 
