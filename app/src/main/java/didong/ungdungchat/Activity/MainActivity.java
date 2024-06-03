@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import didong.ungdungchat.Adapter.TabsAccessorAdapter;
@@ -193,11 +194,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void CreateNewGroup(String groupName) {
          GroupRef = RootRef.child("Groups").child(groupName);
+         //String groupKey = GroupRef.push().getKey();
          GroupRef.setValue("").addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            GroupRef.child("members").child(currentUserID).setValue(currentUserName)
+                            GroupRef.child("members").child(currentUserID).child("name").setValue(currentUserName)
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {

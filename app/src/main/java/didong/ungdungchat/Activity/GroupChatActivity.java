@@ -1,5 +1,6 @@
 package didong.ungdungchat.Activity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -23,19 +25,30 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
+import didong.ungdungchat.Adapter.GroupMessagesAdapter;
+import didong.ungdungchat.Adapter.MessageAdapter;
+import didong.ungdungchat.Model.GroupMessages;
+import didong.ungdungchat.Model.Messages;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityGroupChatBinding;
 
 public class GroupChatActivity extends AppCompatActivity {
 
     ActivityGroupChatBinding binding;
+    boolean isKeyboardShowing = false;
+    private GroupMessagesAdapter groupMessagesAdapter;
+    List<GroupMessages> groupMessagesList = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
     private String currentGroupName, currentUserID, currentUserName, currentDate, currentTime;
@@ -43,13 +56,13 @@ public class GroupChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityGroupChatBinding.inflate(getLayoutInflater());
-        EdgeToEdge.enable(this);
+        //EdgeToEdge.enable(this);
         setContentView(binding.getRoot());
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         Toast.makeText(GroupChatActivity.this, currentGroupName,Toast.LENGTH_SHORT).show();
@@ -59,9 +72,7 @@ public class GroupChatActivity extends AppCompatActivity {
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
 
-        setSupportActionBar(binding.groupChatBarLayout);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(currentGroupName);
-
+        InitializeFields();
         GetUserInfo();
 
         binding.sendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -69,44 +80,59 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SaveMessageInfoToDatabase();
                 binding.inputGroupMessage.setText("");
-                binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
 
-        binding.main.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                binding.main.getWindowVisibleDisplayFrame(r);
-                int screenHeight = binding.main.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
+        binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
 
-                if (keypadHeight > screenHeight * 0.15) {
-                    binding.main.setPadding(0, 0, 0, keypadHeight);
-                    binding.myScrollView.post(() -> binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN));
-                } else {
-                    binding.main.setPadding(0, 0, 0, 0);
-                }
-            }
-        });
+                        Rect r = new Rect();
+                        binding.getRoot().getWindowVisibleDisplayFrame(r);
+                        int screenHeight = binding.getRoot().getRootView().getHeight();
+
+                        // r.bottom is the position above soft keypad or device button.
+                        // if keypad is shown, the r.bottom is smaller than that before.
+                        int keypadHeight = screenHeight - r.bottom;
+
+                        if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                            // keyboard is opened
+                            if (!isKeyboardShowing) {
+                                isKeyboardShowing = true;
+                                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
+                            }
+                        }
+                        else {
+                            // keyboard is closed
+                            if (isKeyboardShowing) {
+                                isKeyboardShowing = false;
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         GroupNameRef.addChildEventListener(new ChildEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(snapshot.exists()){
-                    DisplayMessage(snapshot);
+                if(!snapshot.getKey().equals("members")){
+                    GroupMessages groupMessages = snapshot.getValue(GroupMessages.class);
+                    if(groupMessages != null){
+                        groupMessagesList.add(groupMessages);
+                        groupMessagesAdapter.notifyDataSetChanged();
+                        binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
+                    }
                 }
+
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(snapshot.exists()){
-                    DisplayMessage(snapshot);
-                }
             }
 
             @Override
@@ -126,7 +152,15 @@ public class GroupChatActivity extends AppCompatActivity {
         });
     }
 
-    private void InitializeFields() {}
+    private void InitializeFields() {
+        setSupportActionBar(binding.groupChatBarLayout);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(currentGroupName);
+
+        groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList);
+        linearLayoutManager = new LinearLayoutManager(this);
+        binding.groupsMessagesListOfUsers.setLayoutManager(linearLayoutManager);
+        binding.groupsMessagesListOfUsers.setAdapter(groupMessagesAdapter);
+    }
     private void GetUserInfo() {
         UsersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -161,6 +195,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
             GroupMessageKeyRef = GroupNameRef.child(messageKey);
             HashMap<String, Object> messageInfoMap = new HashMap<>();
+                messageInfoMap.put("from", currentUserID);
+                messageInfoMap.put("type", "text");
                 messageInfoMap.put("name", currentUserName);
                 messageInfoMap.put("message", message);
                 messageInfoMap.put("date", currentDate);
@@ -169,30 +205,4 @@ public class GroupChatActivity extends AppCompatActivity {
 
         }
     }
-
-    private void DisplayMessage(DataSnapshot snapshot) {
-        GroupNameRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                binding.groupChatTextDisplay.setText("");
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                    String chatDate = dataSnapshot.child("date").getValue(String.class);
-                    String chatMessage = dataSnapshot.child("message").getValue(String.class);
-                    String chatName = dataSnapshot.child("name").getValue(String.class);
-                    String chatTime = dataSnapshot.child("time").getValue(String.class);
-
-                    if(chatMessage != null && chatDate != null && chatName != null && chatTime != null){
-                        binding.groupChatTextDisplay.append(chatName + ":\n" + chatMessage + "\n" + chatTime + "       " + chatDate + "\n\n");
-                    }
-                }
-                binding.myScrollView.post(() -> binding.myScrollView.fullScroll(ScrollView.FOCUS_DOWN));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
 }

@@ -23,16 +23,19 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import didong.ungdungchat.Activity.GroupChatActivity;
+import didong.ungdungchat.Adapter.GroupsAdapter;
+import didong.ungdungchat.Model.Groups;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityMainBinding;
 import didong.ungdungchat.databinding.FragmentGroupsBinding;
 public class GroupsFragment extends Fragment {
     FragmentGroupsBinding binding;
-    private ArrayAdapter<String> arrayAdapter;
-    private ArrayList<String> listGroup = new ArrayList<>();
+    private GroupsAdapter groupsAdapter;
+    private List<Groups> listGroup = new ArrayList<>();
     private DatabaseReference GroupRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
@@ -52,7 +55,8 @@ public class GroupsFragment extends Fragment {
         binding.listGroups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String currentGroupName = parent.getItemAtPosition(position).toString();
+                Groups groups = (Groups) parent.getItemAtPosition(position);
+                String currentGroupName = groups.getName();
                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                 groupChatIntent.putExtra("groupName", currentGroupName);
                 startActivity(groupChatIntent);
@@ -62,8 +66,8 @@ public class GroupsFragment extends Fragment {
     }
 
     private void IntializeFields() {
-        arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, listGroup);
-        binding.listGroups.setAdapter(arrayAdapter);
+        groupsAdapter = new GroupsAdapter(getContext(), R.layout.groups_display_layout, listGroup);
+        binding.listGroups.setAdapter(groupsAdapter);
     }
     private void RetrieveAndDisplayGroup() {
         currentUserID = mAuth.getCurrentUser().getUid();
@@ -73,10 +77,13 @@ public class GroupsFragment extends Fragment {
                 listGroup.clear();
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()){
                     if (dataSnapshot.child("members").child(currentUserID).exists()) {
-                        listGroup.add(dataSnapshot.getKey());
+                        Groups gr = new Groups();
+                        String name = dataSnapshot.getKey();
+                        gr.setName(name);
+                        listGroup.add(gr);
                     }
                 }
-                arrayAdapter.notifyDataSetChanged();
+                groupsAdapter.notifyDataSetChanged();
             }
 
             @Override
