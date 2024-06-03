@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="@string/login"
+        android:text="@string/phone"
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -31,11 +31,12 @@
         >
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/login_email"
+            android:id="@+id/login_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/baseline_email_24"
-            android:hint="@string/email" />
+            android:inputType="number"
+            android:drawableStart="@drawable/baseline_contact_phone_24"
+            android:hint="@string/text_phone" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -43,63 +44,32 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/login_password"
+            android:id="@+id/login_otp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
+
             android:drawableStart="@drawable/baseline_lock_24"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:hint="@string/verify" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/forgotPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="@string/forgot_password"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/colorPrimary" />
-
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSendVerifycation"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:backgroundTint="@color/button"
         android:textSize="20sp"
         android:layout_marginTop="5dp"
-        android:text="@string/login" />
-
-    <TextView
-        android:id="@+id/need_new_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/need_new_account"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:layout_marginTop="5dp"
-        android:textColor="@color/colorPrimary" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/or_login_using_your"
-        android:textSize="16sp"
-        android:layout_marginTop="5dp"
-        android:gravity="center"/>
+        android:text="@string/send_verify" />
 
     <Button
-        android:id="@+id/btnPhone"
+        android:id="@+id/btnVerify"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
-        android:text="@string/phone"
+        android:text="@string/send_verify_again"
         android:backgroundTint="@color/button"
         android:layout_marginTop="5dp"
         android:textSize="20sp" />
