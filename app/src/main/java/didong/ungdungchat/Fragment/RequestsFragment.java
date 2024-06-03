@@ -30,21 +30,7 @@ import didong.ungdungchat.databinding.FragmentContactsBinding;
 import didong.ungdungchat.databinding.FragmentRequestsBinding;
 import didong.ungdungchat.databinding.UsersDisplayLayoutBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RequestsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class RequestsFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     FragmentRequestsBinding binding;
 
@@ -52,42 +38,12 @@ public class RequestsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private String currentUserID;
 
-    public RequestsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment RequestsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RequestsFragment newInstance(String param1, String param2) {
-        RequestsFragment fragment = new RequestsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_requests, container, false);
+        binding = FragmentRequestsBinding.bind(view);
         binding.chatRequestsList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mAuth = FirebaseAuth.getInstance();
@@ -110,8 +66,8 @@ public class RequestsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull RequestsViewHolder holder, int position, @NonNull Contacts model)
             {
-                holder.itemView.findViewById(R.id.requests_accept_btn).setVisibility(View.VISIBLE);
-                holder.itemView.findViewById(R.id.requests_cancel_btn).setVisibility(View.VISIBLE);
+                holder.AccecptIButton.setVisibility(View.VISIBLE);
+                holder.CancelIButton.setVisibility(View.VISIBLE);
 
                 final String list_user_id = getRef(position).getKey();
 
@@ -136,7 +92,7 @@ public class RequestsFragment extends Fragment {
 
                                             holder.userName.setText(requestUserName);
                                             holder.userStatus.setText(requestUserStatus);
-                                            Picasso.get().load(requestProfileImage).into(holder.profilImage);
+                                            Picasso.get().load(requestProfileImage).into(holder.profileImage);
                                         }
                                         else
                                         {
@@ -168,8 +124,7 @@ public class RequestsFragment extends Fragment {
             @Override
             public RequestsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_display_layout, parent, false);
-                RequestsViewHolder holder = new RequestsViewHolder(UsersDisplayLayoutBinding.bind(view));
-                return holder;
+                return new RequestsViewHolder(UsersDisplayLayoutBinding.bind(view));
             }
         };
 
@@ -180,14 +135,14 @@ public class RequestsFragment extends Fragment {
     public static class RequestsViewHolder extends RecyclerView.ViewHolder
     {
         TextView userName, userStatus;
-        CircleImageView profilImage;
+        CircleImageView profileImage;
         ImageButton AccecptIButton, CancelIButton;
         public RequestsViewHolder(UsersDisplayLayoutBinding itemView) {
             super(itemView.getRoot());
 
             userName = itemView.userProfileName;
             userStatus = itemView.userStatus;
-            profilImage = itemView.usersProfileImage;
+            profileImage = itemView.usersProfileImage;
             AccecptIButton = itemView.requestsAcceptBtn;
             CancelIButton = itemView.requestsCancelBtn;
         }
