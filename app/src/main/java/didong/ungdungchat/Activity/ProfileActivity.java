@@ -100,11 +100,11 @@ public class ProfileActivity extends AppCompatActivity {
 
                             if(request_type.equals("sent")){
                                 Current_State = "request_sent";
-                                binding.sendMessageRequestButton.setText("Cancel Chat Request");
+                                binding.sendMessageRequestButton.setText("Huỷ lời mời");
                             }
                             else if (request_type.equals("received")){
                                 Current_State = "request_received";
-                                binding.sendMessageRequestButton.setText("Accept Chat Request");
+                                binding.sendMessageRequestButton.setText("Chấp nhận lời mời");
 
                                 binding.declineMessageRequestButton.setVisibility(View.VISIBLE);
                                 binding.declineMessageRequestButton.setEnabled(true);
@@ -123,7 +123,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             if (snapshot.hasChild(receiverUserID)){
                                                 Current_State = "friends";
-                                                binding.sendMessageRequestButton.setText("Remove this Contact");
+                                                binding.sendMessageRequestButton.setText("Huỷ kết bạn");
                                             }
                                         }
 
@@ -182,7 +182,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             if(task.isSuccessful()){
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State = "new";
-                                                binding.sendMessageRequestButton.setText("Send Message");
+                                                binding.sendMessageRequestButton.setText("Gửi lời mời");
 
                                                 binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
                                                 binding.declineMessageRequestButton.setEnabled(false);
@@ -221,7 +221,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                                                     binding.sendMessageRequestButton.setEnabled(true);
                                                                                     Current_State = "friends";
 
-                                                                                    binding.sendMessageRequestButton.setText("Remove this Contact");
+                                                                                    binding.sendMessageRequestButton.setText("Huỷ kết bạn");
 
                                                                                     binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
                                                                                     binding.declineMessageRequestButton.setEnabled(false);
@@ -253,7 +253,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             if(task.isSuccessful()){
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State = "new";
-                                                binding.sendMessageRequestButton.setText("Send Message");
+                                                binding.sendMessageRequestButton.setText("Gửi lời mời");
 
                                                 binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
                                                 binding.declineMessageRequestButton.setEnabled(false);
@@ -281,7 +281,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             {
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State ="request_sent";
-                                                binding.sendMessageRequestButton.setText("Cancel Chat Request");
+                                                binding.sendMessageRequestButton.setText("Huỷ lời mời");
                                             }
                                         }
                                     });

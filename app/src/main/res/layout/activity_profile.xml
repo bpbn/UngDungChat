@@ -56,7 +56,7 @@
         android:textColor="@android:color/background_light"
         android:textStyle="bold"
         android:textSize="20sp"
-        android:text="Send Message"
+        android:text="Gửi lời mời"
         android:textAllCaps="false"
         />
 
@@ -71,7 +71,7 @@
         android:textColor="@android:color/background_light"
         android:textStyle="bold"
         android:textSize="20sp"
-        android:text="Cancel Chat Request"
+        android:text="Huỷ lời mời"
         android:textAllCaps="false"
         android:visibility="invisible"
         />

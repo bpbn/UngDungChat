@@ -18,8 +18,12 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.time.temporal.Temporal;
 
@@ -48,7 +52,7 @@ public class ContactsFragment extends Fragment {
 
     FragmentContactsBinding binding;
 
-    private DatabaseReference ContactsRef;
+    private DatabaseReference ContactsRef, UsersRef;
 
     private FirebaseAuth mAuth;
 
@@ -97,6 +101,7 @@ public class ContactsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
+        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         return view;
     }
 
@@ -107,7 +112,51 @@ public class ContactsFragment extends Fragment {
                 .setQuery(ContactsRef, Contacts.class)
                 .build();
 
-        FirebaseRecyclerAdapter<Contacts>
+        FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull ContactsViewHolder holder, int position, @NonNull Contacts model) {
+                String userIDs = getRef(position).getKey();
+                UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild("image"))
+                        {
+                            String userImage = snapshot.child("image").getValue().toString();
+                            String profileName = snapshot.child("name").getValue().toString();
+                            String profileStatus = snapshot.child("status").getValue().toString();
+
+                            holder.userName.setText(profileName);
+                            holder.userStatus.setText(profileStatus);
+                            Picasso.get().load(userImage).placeholder(R.drawable.baseline_account_circle_24).into(holder.profileImage);
+                        }
+                        else
+                        {
+                            String profileName = snapshot.child("name").getValue().toString();
+                            String profileStatus = snapshot.child("status").getValue().toString();
+
+                            holder.userName.setText(profileName);
+                            holder.userStatus.setText(profileStatus);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @NonNull
+            @Override
+            public ContactsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.users_display_layout, parent, false);
+                ContactsViewHolder viewHolder = new ContactsViewHolder(UsersDisplayLayoutBinding.bind(view));
+                return viewHolder;
+            }
+        };
+
+        binding.contactsList.setAdapter(adapter);
+        adapter.startListening();
     }
     public static class ContactsViewHolder extends RecyclerView.ViewHolder
     {
