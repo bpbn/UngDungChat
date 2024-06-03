@@ -7,13 +7,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
+    android:background="@color/white"
     tools:context=".Activity.LoginActivity">
 
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:src="@drawable/img_login" />
+        android:src="@drawable/computer_login_bro" />
 
     <TextView
         android:layout_width="match_parent"
@@ -67,6 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
+        android:backgroundTint="@color/button"
         android:textSize="20sp"
         android:layout_marginTop="5dp"
         android:text="@string/login" />
@@ -98,6 +100,7 @@
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:text="@string/phone"
+        android:backgroundTint="@color/button"
         android:layout_marginTop="5dp"
         android:textSize="20sp" />
 

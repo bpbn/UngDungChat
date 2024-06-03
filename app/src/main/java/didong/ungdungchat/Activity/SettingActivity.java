@@ -177,6 +177,7 @@ public class SettingActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess() {
                                             // Xử lý thành công
+//                                            Picasso.get().load(profileImage).into(binding.profileImage);
                                         }
 
                                         @Override
@@ -189,7 +190,7 @@ public class SettingActivity extends AppCompatActivity {
                                 binding.username.setText(userName);
                                 binding.profileStatus.setText(status);
 
-//                                Picasso.get().load(profileImage).into(binding.profileImage);
+                                Picasso.get().load(profileImage).into(binding.profileImage);
                             }
                         }
                             else if((snapshot.exists()) && (snapshot.hasChild("name")))
