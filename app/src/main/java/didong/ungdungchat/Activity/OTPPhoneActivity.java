@@ -9,16 +9,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import didong.ungdungchat.R;
-import didong.ungdungchat.databinding.ActivityMainBinding;
-import didong.ungdungchat.databinding.ActivityPhoneLoginBinding;
+import didong.ungdungchat.databinding.ActivityOtpphoneBinding;
 
-public class PhoneLoginActivity extends AppCompatActivity {
+public class OTPPhoneActivity extends AppCompatActivity {
 
-    private ActivityPhoneLoginBinding binding;
+    private ActivityOtpphoneBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityPhoneLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityOtpphoneBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
     }
 }

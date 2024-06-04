@@ -51,4 +51,7 @@ dependencies {
     implementation("com.mikhaellopez:circularimageview:4.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.github.mukeshsolanki.android-otpview-pinview:otpview-compose:3.1.0")
+    implementation("com.github.mukeshsolanki.android-otpview-pinview:otpview:3.1.0")
+//    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
 }
