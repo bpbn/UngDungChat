@@ -35,7 +35,7 @@ import didong.ungdungchat.databinding.UsersDisplayLayoutBinding;
 
 public class ChatsFragment extends Fragment {
     FragmentChatsBinding binding;
-    DatabaseReference ChatsRef, UsersRef;
+    DatabaseReference chatsRef, usersRef;
     FirebaseAuth mAuth;
     String currentUserID;
     @Override
@@ -46,8 +46,8 @@ public class ChatsFragment extends Fragment {
         binding = FragmentChatsBinding.bind(view);
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-        ChatsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
-        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        chatsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         binding.chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
         return view;
     }
@@ -56,7 +56,7 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(ChatsRef, Contacts.class)
+                .setQuery(chatsRef, Contacts.class)
                 .build();
         FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
@@ -66,7 +66,7 @@ public class ChatsFragment extends Fragment {
                         final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};
 
-                        UsersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
+                        usersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot)
                             {
