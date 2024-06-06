@@ -1,10 +1,30 @@
 {
   "project_info": {
     "project_number": "725358954796",
+    "firebase_url": "https://ungdungchat-9ea1c-default-rtdb.firebaseio.com",
     "project_id": "ungdungchat-9ea1c",
     "storage_bucket": "ungdungchat-9ea1c.appspot.com"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725358954796:android:894db286ebcd724247c489",
+        "android_client_info": {
+          "package_name": "com.example.lab11"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADBOj4duJVZamB4zxK-tV7l1XMME7aGYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:725358954796:android:a640eba0914255a347c489",

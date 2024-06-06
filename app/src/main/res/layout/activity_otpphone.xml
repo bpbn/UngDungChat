@@ -17,27 +17,32 @@
         android:src="@drawable/computer_login_bro" />
 
     <TextView
+        android:id="@+id/verify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:text="@string/phone"
-        android:textSize="28sp"
-        android:textStyle="bold" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
+        android:text="Verify your account"
+        android:textSize="18sp"
+/>
+    <com.mukeshsolanki.OtpView
+        android:id="@+id/otp_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        >
+        android:layout_marginTop="72dp"
+        android:inputType="number"
+        android:itemBackground="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        app:OtpItemCount="6"
+        android:focusableInTouchMode="true"
+        android:layout_gravity="center"
+        app:OtpLineColor="@color/white"
+        app:OtpViewType="line"
+        />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/login_phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:drawableStart="@drawable/baseline_contact_phone_24"
-            android:hint="@string/text_phone" />
-    </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/loi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
 
     <Button
@@ -47,7 +52,6 @@
         android:layout_gravity="center"
         android:backgroundTint="@color/button"
         android:textSize="20sp"
-        android:layout_marginTop="5dp"
         android:text="@string/send_verify" />
 
 </LinearLayout>
