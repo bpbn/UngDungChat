@@ -43,6 +43,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-appcheck-debug")
     implementation("com.firebaseui:firebase-ui-database:8.0.2")
     implementation("androidx.activity:activity:1.9.0")
     testImplementation("junit:junit:4.13.2")
@@ -51,4 +53,7 @@ dependencies {
     implementation("com.mikhaellopez:circularimageview:4.3.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.github.mukeshsolanki.android-otpview-pinview:otpview-compose:3.1.0")
+    implementation("com.github.mukeshsolanki.android-otpview-pinview:otpview:3.1.0")
+//    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
 }

@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void sendUserToSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
     private void RequestNewGroup() {
