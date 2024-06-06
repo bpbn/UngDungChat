@@ -13,7 +13,20 @@
           "package_name": "com.example.lab11"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "725358954796-o5gge0mmikrjgtt6892i4n9pb5q8qae7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lab11",
+            "certificate_hash": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+          }
+        },
+        {
+          "client_id": "725358954796-qekqbd0thcgqls4kvinc3rv5tr0de2bj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyADBOj4duJVZamB4zxK-tV7l1XMME7aGYs"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725358954796-qekqbd0thcgqls4kvinc3rv5tr0de2bj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -32,7 +50,20 @@
           "package_name": "didong.ungdungchat"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "725358954796-tsrqi71ias2f6m15fl234b8uhjtf3bf5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "didong.ungdungchat",
+            "certificate_hash": "e55fd20ce9cad92feb62591c5ca206a4db4bd6c8"
+          }
+        },
+        {
+          "client_id": "725358954796-qekqbd0thcgqls4kvinc3rv5tr0de2bj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyADBOj4duJVZamB4zxK-tV7l1XMME7aGYs"
@@ -40,7 +71,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725358954796-qekqbd0thcgqls4kvinc3rv5tr0de2bj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

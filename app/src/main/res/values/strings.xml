@@ -2,6 +2,7 @@
     <string name="app_name">UngDungChat</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="client_id">725358954796-qekqbd0thcgqls4kvinc3rv5tr0de2bj.apps.googleusercontent.com</string>
     <string name="login">LOGIN</string>
     <string name="register">REGISTER</string>
     <string name="email">Email</string>
@@ -24,4 +25,5 @@
     <string name="status_profile">Status Profile</string>
     <string name="update">UPDATE</string>
     <string name="user_status">user status</string>
+    <string name="google">Google</string>
 </resources>

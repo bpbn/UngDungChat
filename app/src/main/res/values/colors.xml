@@ -7,6 +7,7 @@
     <color name="black">#000000</color>
     <color name="colorChat">#F5FCCD</color>
     <color name="button">#53C17F</color>
+    <color name="otp">#45AC6E</color>
     <color name="chat_background">#B5DFC4</color>
     <color name="red">#FF0000</color>
 </resources>

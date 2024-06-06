@@ -81,7 +81,21 @@ public class RegisterActivity extends AppCompatActivity {
                                 String currentUserId = mAuth.getCurrentUser().getUid();
                                 Rootref.child("Users").child(currentUserId).setValue("");
 
-                                sendUserToMainActivity();
+                                mAuth.getCurrentUser().sendEmailVerification()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+//                                                    sendUserToMainActivity();
+                                                    Toast.makeText(RegisterActivity.this, "Account created successfully. Please verify your email id.", Toast.LENGTH_SHORT).show();
+                                                    loading.dismiss();
+                                                }
+
+                                            }
+                                        });
+
+//                                sendUserToMainActivity();
+                                sendUserToLoginActivity();
                                 Toast.makeText(RegisterActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                             }
@@ -89,7 +103,6 @@ public class RegisterActivity extends AppCompatActivity {
                             {
                                 String error = task.getException().toString();
                                 Toast.makeText(RegisterActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
-                                Log.d("", error);
                                 loading.dismiss();
                             }
                         }

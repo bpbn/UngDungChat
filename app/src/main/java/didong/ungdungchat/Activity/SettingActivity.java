@@ -2,6 +2,7 @@ package didong.ungdungchat.Activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -109,6 +110,12 @@ public class SettingActivity extends AppCompatActivity {
         loadingBar.setTitle("Updating Profile");
         loadingBar.setMessage("Please wait while we are updating your profile...");
         loadingBar.setCanceledOnTouchOutside(false);
+        loadingBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Toast.makeText(SettingActivity.this, "Please complete all fields before updating your profile", Toast.LENGTH_SHORT).show();
+            }
+        });
         loadingBar.show();
 
         if (selectedImageUri != null) {
@@ -187,7 +194,7 @@ public class SettingActivity extends AppCompatActivity {
                                 Picasso.get().load(currentProfileImageUrl).into(binding.profileImage);
                             }
                         } else {
-                            Toast.makeText(SettingActivity.this, "Please set & update your profile information", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingActivity.this, "Please set your profile information", Toast.LENGTH_SHORT).show();
                         }
                     }
 

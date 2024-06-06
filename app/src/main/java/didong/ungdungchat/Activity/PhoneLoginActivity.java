@@ -2,9 +2,12 @@ package didong.ungdungchat.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 
 import didong.ungdungchat.databinding.ActivityPhoneLoginBinding;
 
@@ -24,22 +27,24 @@ public class PhoneLoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String phoneNumber = binding.loginPhone.getText().toString().trim();
 
-                // Validate the phone number
                 if (phoneNumber.isEmpty()) {
                     binding.loginPhone.setError("Phone number is required");
                     return;
                 }
 
-                // Check if the phone number starts with the country code
-                if (!phoneNumber.startsWith("+")) {
-                    binding.loginPhone.setError("Phone number must include country code and start with +");
+                if (!phoneNumber.startsWith("0")) {
+                    binding.loginPhone.setError("Phone number is incorrect");
                     return;
                 }
 
-                // Check the length of the phone number (including country code)
-                if (phoneNumber.length() < 10) {
-                    binding.loginPhone.setError("Phone number is too short");
+                if (phoneNumber.length() < 10 || phoneNumber.length() >= 11) {
+                    binding.loginPhone.setError("Phone number must be 10 digits");
                     return;
+                }
+                
+                if(phoneNumber.startsWith("0"))
+                {
+                    phoneNumber = "+84" + phoneNumber.substring(1);
                 }
 
                 Intent intent = new Intent(PhoneLoginActivity.this, OTPPhoneActivity.class);

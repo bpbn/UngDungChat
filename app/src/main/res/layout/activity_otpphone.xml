@@ -8,42 +8,39 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:background="@color/white"
+    android:gravity="center"
     tools:context=".Activity.LoginActivity">
 
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:src="@drawable/computer_login_bro" />
+        android:src="@drawable/otp" />
 
     <TextView
         android:id="@+id/verify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Verify your account"
-        android:textSize="18sp"
-/>
+        android:gravity="center"
+        android:textSize="18sp" />
+
     <com.mukeshsolanki.OtpView
         android:id="@+id/otp_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="10dp"
         android:inputType="number"
-        android:itemBackground="@color/colorPrimary"
-        android:textColor="@android:color/white"
+        android:itemBackground="@color/white"
+        android:textColor="@color/colorPrimary"
         app:OtpItemCount="6"
         android:focusableInTouchMode="true"
         android:layout_gravity="center"
-        app:OtpLineColor="@color/white"
+        app:OtpLineColor="@color/otp"
         app:OtpViewType="line"
-        />
+        android:textSize="18sp"
 
-    <TextView
-        android:id="@+id/loi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         />
-
 
     <Button
         android:id="@+id/btnSendVerifycation"
@@ -51,6 +48,7 @@
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:backgroundTint="@color/button"
+        android:layout_marginTop="10dp"
         android:textSize="20sp"
         android:text="@string/send_verify" />
 

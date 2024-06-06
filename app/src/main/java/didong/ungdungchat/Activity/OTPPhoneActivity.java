@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
@@ -55,7 +56,10 @@ public class OTPPhoneActivity extends AppCompatActivity {
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                        signInWithPhoneAuthCredential(phoneAuthCredential);
+//                        signInWithPhoneAuthCredential(phoneAuthCredential);
+                        loaddialog.dismiss();
+                        Toast.makeText(OTPPhoneActivity.this, "OTP Received", Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
@@ -73,14 +77,19 @@ public class OTPPhoneActivity extends AppCompatActivity {
                         Toast.makeText(OTPPhoneActivity.this, "OTP Sent", Toast.LENGTH_SHORT).show();
                     }
                 }).build();
-
         PhoneAuthProvider.verifyPhoneNumber(options);
-
-        binding.otpView.setOtpCompletionListener(new OnOtpCompletionListener() {
+        binding.btnSendVerifycation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onOtpCompleted(String otp) {
-                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
-                signInWithPhoneAuthCredential(credential);
+            public void onClick(View v) {
+                String otp = binding.otpView.getText().toString();
+                if (otp != null && !otp.isEmpty()) {
+                    loaddialog.setMessage("Verifying OTP...");
+                    loaddialog.show();
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
+                    signInWithPhoneAuthCredential(credential);
+                } else {
+                    Toast.makeText(OTPPhoneActivity.this, "Please enter the OTP", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -114,6 +123,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
         });
     }
 
+
     private void handleVerificationFailure(FirebaseException e) {
         if (e instanceof FirebaseAuthException) {
             FirebaseAuthException authException = (FirebaseAuthException) e;
@@ -127,7 +137,6 @@ public class OTPPhoneActivity extends AppCompatActivity {
             }
         }
         Toast.makeText(OTPPhoneActivity.this, "Verification Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        binding.loi.setText(e.getMessage());
     }
 
     private void handleSignInFailure(Exception e) {
