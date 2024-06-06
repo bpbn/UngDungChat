@@ -100,7 +100,7 @@ public class RequestsFragment extends Fragment {
                                         final String requestUserStatus = snapshot.child("status").getValue().toString();
 
                                         holder.userName.setText(requestUserName);
-                                        holder.userStatus.setText(requestUserName + "gửi lời mời đến bạn ");
+                                        holder.userStatus.setText(requestUserName + " gửi lời mời đến bạn ");
 
                                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                                             @Override
@@ -204,9 +204,9 @@ public class RequestsFragment extends Fragment {
 
                             else if(type.equals("sent"))
                             {
-                                holder.accecptIButton.setImageIcon();
+                                holder.accecptIButton.setImageResource(R.drawable.baseline_check_circle_24);
 
-                                holder.cancelIButton.setVisibility(View.VISIBLE);
+                                holder.cancelIButton.setVisibility(View.INVISIBLE);
 
                                 userRef.child(list_user_id).addValueEventListener( new ValueEventListener() {
                                     @Override
@@ -221,68 +221,23 @@ public class RequestsFragment extends Fragment {
                                         final String requestUserStatus = snapshot.child("status").getValue().toString();
 
                                         holder.userName.setText(requestUserName);
-                                        holder.userStatus.setText("Bạn đã gửi lời mời tới" + requestUserName);
+                                        holder.userStatus.setText("Bạn đã gửi lời mời tới " + requestUserName);
 
                                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
                                                 CharSequence options[] = new CharSequence[]
                                                         {
-                                                                "Accecpt",
-                                                                "Cancel"
+                                                                "Xoá yêu cầu"
                                                         };
                                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                                builder.setTitle(requestUserName + "Chat Request");
+                                                builder.setTitle("Bắt đầu cuộc trò chuyện");
 
                                                 builder.setItems(options, new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int i)
                                                     {
-                                                        if( i == 0 )
-                                                        {
-                                                            contactsRef.child(currentUserID).child(list_user_id).child("Contact")
-                                                                    .setValue("Saved").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                        @Override
-                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                            if(task.isSuccessful())
-                                                                            {
-                                                                                contactsRef.child(list_user_id).child(currentUserID).child("Contact")
-                                                                                        .setValue("Saved").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                            @Override
-                                                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                                                if(task.isSuccessful())
-                                                                                                {
-                                                                                                    chatRequestsRef.child(currentUserID).child(list_user_id)
-                                                                                                            .removeValue()
-                                                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                @Override
-                                                                                                                public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                    if(task.isSuccessful())
-                                                                                                                    {
-                                                                                                                        chatRequestsRef.child(list_user_id).child(currentUserID)
-                                                                                                                                .removeValue()
-                                                                                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                    @Override
-                                                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                        if(task.isSuccessful())
-                                                                                                                                        {
-                                                                                                                                            Toast.makeText(getContext(), "New Contact Saved", Toast.LENGTH_SHORT).show();
-
-                                                                                                                                        }
-                                                                                                                                    }
-                                                                                                                                });
-                                                                                                                    }
-                                                                                                                }
-                                                                                                            });
-
-                                                                                                }
-                                                                                            }
-                                                                                        });
-                                                                            }
-                                                                        }
-                                                                    });
-                                                        }
-                                                        if( i == 1)
+                                                        if( i == 0)
                                                         {
                                                             chatRequestsRef.child(currentUserID).child(list_user_id)
                                                                     .removeValue()
@@ -298,7 +253,7 @@ public class RequestsFragment extends Fragment {
                                                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                                                 if(task.isSuccessful())
                                                                                                 {
-                                                                                                    Toast.makeText(getContext(), "Contact Delete", Toast.LENGTH_SHORT).show();
+                                                                                                    Toast.makeText(getContext(), "Bạn có thể xoá yêu cầu này", Toast.LENGTH_SHORT).show();
 
                                                                                                 }
                                                                                             }
