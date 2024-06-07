@@ -30,6 +30,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityLoginBinding;
@@ -37,6 +40,7 @@ import didong.ungdungchat.databinding.ActivityLoginBinding;
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private DatabaseReference UsersRef;
     private ProgressDialog loading;
     ActivityLoginBinding binding;
     GoogleSignInOptions gOptions;
@@ -51,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
+        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         loading = new ProgressDialog(this);
         binding.needNewAccount.setOnClickListener(new View.OnClickListener() {
@@ -151,8 +156,24 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                if (user.isEmailVerified())
-                                    sendUserToMainActivity();
+                                if (user.isEmailVerified()){
+                                    String currentUserId = mAuth.getCurrentUser().getUid();
+                                    String deviceToken = FirebaseMessaging.getInstance().getToken().toString();
+
+                                    UsersRef.child(currentUserId).child("device_token")
+                                            .setValue(deviceToken)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        sendUserToMainActivity();
+                                                        Toast.makeText(LoginActivity.this, "Logged in Successful...", Toast.LENGTH_SHORT).show();
+                                                        loading.dismiss();
+                                                    }
+                                                }
+                                            });
+//                                    sendUserToMainActivity();
+                                }
                                 else
                                     Toast.makeText(LoginActivity.this, "Please verify your email", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
