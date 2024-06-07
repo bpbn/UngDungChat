@@ -19,12 +19,12 @@ public class PushNotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        if (notification != null) {
-            String title = notification.getTitle();
-            String body = notification.getBody();
-//            sendNotification(title, body);
-        }
+//        RemoteMessage.Notification notification = remoteMessage.getNotification();
+//        if (notification != null) {
+//            String title = notification.getTitle();
+//            String body = notification.getBody();
+////            sendNotification(title, body);
+//        }
     }
 
     private void sendNotification(String title, String body) {
