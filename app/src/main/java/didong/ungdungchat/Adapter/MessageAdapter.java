@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -90,6 +92,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (fromUserID.equals(messageSenderId))
             {
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.senderMessageText.setPadding(20,20, 20, 20);
+
 
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
                 messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
@@ -99,6 +103,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             {
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverMessageText.setPadding(20,20, 20, 20);
 
                 messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
                 messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);

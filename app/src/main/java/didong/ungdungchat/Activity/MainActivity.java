@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        askNotificationPermission();
     }
     @Override
     protected void onStart() {

@@ -10,6 +10,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
         android:src="@drawable/baseline_account_circle_24"
+        android:layout_marginLeft="5dp"
         />
 
     <TextView
@@ -26,6 +27,7 @@
         android:textSize="14sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:layout_marginRight="15dp"
         />
 
 
@@ -61,6 +63,8 @@
         android:padding="10dp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="5dp"
         />
 
 </RelativeLayout>

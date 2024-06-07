@@ -87,6 +87,12 @@ public class RequestsFragment extends Fragment {
                         {
                             String type = snapshot.getValue().toString();
                             if(type.equals("received")){
+                                holder.accecptIButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), "Bạn đã ấn vào nút đồng ý", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                                 userRef.child(list_user_id).addValueEventListener( new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
