@@ -66,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     tab.setText("Liên hệ");
                     break;
+                case 3:
+                    tab.setText("Yêu cầu");
+                    break;
             }
         }).attach();
         binding.mainTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         {
             sendUserToLoginActivity();
         }
+
         else
         {
             VerifyUserExistance();
@@ -101,32 +105,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void VerifyUserExistance() {
-        String currentUserId = mAuth.getCurrentUser().getUid();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            String currentUserId = currentUser.getUid();
 
-        RootRef.child("Users").child(currentUserId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists())
-                {
-                    Log.d("Snapshot", snapshot.toString());
-                    if(snapshot.child("name").exists())
-                    {
-//                        Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-                     }
-                    else
-                    {
+            RootRef.child("Users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        Log.d("Snapshot", snapshot.toString());
+                        if(!snapshot.child("name").exists()) {
+                            sendUserToSettingActivity();
+                        }
+                    } else {
                         sendUserToSettingActivity();
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "Không thể truy cập dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            sendUserToSettingActivity();
+        }
     }
+
 
     private void sendUserToLoginActivity() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -141,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void sendUserToSettingActivity() {
         Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
     private void RequestNewGroup() {

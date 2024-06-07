@@ -52,7 +52,7 @@ public class ContactsFragment extends Fragment {
 
     FragmentContactsBinding binding;
 
-    private DatabaseReference ContactsRef, UsersRef;
+    private DatabaseReference contactsRef, usersRef;
 
     private FirebaseAuth mAuth;
 
@@ -100,8 +100,8 @@ public class ContactsFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-        ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
-        UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        contactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
+        usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         return view;
     }
 
@@ -109,14 +109,14 @@ public class ContactsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(ContactsRef, Contacts.class)
+                .setQuery(contactsRef, Contacts.class)
                 .build();
 
         FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter = new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull ContactsViewHolder holder, int position, @NonNull Contacts model) {
                 String userIDs = getRef(position).getKey();
-                UsersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
+                usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.hasChild("image"))

@@ -94,6 +94,15 @@
         android:layout_marginTop="5dp"
         android:gravity="center"/>
 
+    <com.developer.gbuttons.GoogleSignInButton
+        android:id="@+id/btnGoogle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:textSize="20sp"
+        />
+
     <Button
         android:id="@+id/btnPhone"
         android:layout_width="match_parent"

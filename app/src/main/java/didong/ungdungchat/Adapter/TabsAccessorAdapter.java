@@ -10,6 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import didong.ungdungchat.Fragment.ChatsFragment;
 import didong.ungdungchat.Fragment.ContactsFragment;
 import didong.ungdungchat.Fragment.GroupsFragment;
+import didong.ungdungchat.Fragment.RequestsFragment;
 
 public class TabsAccessorAdapter extends FragmentStateAdapter {
 
@@ -27,6 +28,8 @@ public class TabsAccessorAdapter extends FragmentStateAdapter {
                 return new GroupsFragment();
             case 2:
                 return new ContactsFragment();
+            case 3:
+                return new RequestsFragment();
             default:
                 return null;
         }
@@ -34,6 +37,6 @@ public class TabsAccessorAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }

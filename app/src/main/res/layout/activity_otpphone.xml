@@ -15,31 +15,32 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:src="@drawable/phone" />
+        android:src="@drawable/otp" />
 
     <TextView
+        android:id="@+id/verify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:text="Verify your account"
         android:gravity="center"
-        android:text="@string/phone"
-        android:textSize="28sp"
-        android:textStyle="bold" />
+        android:textSize="18sp" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
+    <com.mukeshsolanki.OtpView
+        android:id="@+id/otp_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        >
-        <com.google.android.material.textfield.TextInputEditText
+        android:layout_marginTop="10dp"
+        android:inputType="number"
+        android:itemBackground="@color/white"
+        android:textColor="@color/colorPrimary"
+        app:OtpItemCount="6"
+        android:focusableInTouchMode="true"
+        android:layout_gravity="center"
+        app:OtpLineColor="@color/otp"
+        app:OtpViewType="line"
+        android:textSize="18sp"
 
-            android:id="@+id/login_phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="phone"
-            android:drawableStart="@drawable/baseline_contact_phone_24"
-            android:hint="@string/text_phone" />
-    </com.google.android.material.textfield.TextInputLayout>
-
+        />
 
     <Button
         android:id="@+id/btnSendVerifycation"
@@ -47,8 +48,8 @@
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:backgroundTint="@color/button"
-        android:textSize="20sp"
         android:layout_marginTop="10dp"
+        android:textSize="20sp"
         android:text="@string/send_verify" />
 
 </LinearLayout>
