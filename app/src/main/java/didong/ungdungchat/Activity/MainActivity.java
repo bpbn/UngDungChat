@@ -104,62 +104,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private void VerifyUserExistance() {
-//        String currentUserId = mAuth.getCurrentUser().getUid();
-//
-//        RootRef.child("Users").child(currentUserId).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists())
-//                {
-//                    Log.d("Snapshot", snapshot.toString());
-//                    if(snapshot.child("name").exists())
-//                    {
-////                        Toast.makeText(MainActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-//                     }
-//                    else
-//                    {
-//                        sendUserToSettingActivity();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//    }
-private void VerifyUserExistance() {
-    FirebaseUser currentUser = mAuth.getCurrentUser();
-    if (currentUser != null) {
-        String currentUserId = currentUser.getUid();
+    private void VerifyUserExistance() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            String currentUserId = currentUser.getUid();
 
-        RootRef.child("Users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    Log.d("Snapshot", snapshot.toString());
-                    if(!snapshot.child("name").exists()) {
+            RootRef.child("Users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        Log.d("Snapshot", snapshot.toString());
+                        if(!snapshot.child("name").exists()) {
+                            sendUserToSettingActivity();
+                        }
+                    } else {
                         sendUserToSettingActivity();
                     }
-                } else {
-                    sendUserToSettingActivity();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Xử lý khi có lỗi xảy ra trong quá trình truy cập dữ liệu từ Firebase
-                Toast.makeText(MainActivity.this, "Failed to access Firebase data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    } else {
-        // Nếu currentUser là null, chuyển hướng đến SettingsActivity
-        sendUserToSettingActivity();
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "Không thể truy cập dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            sendUserToSettingActivity();
+        }
     }
-}
 
 
     private void sendUserToLoginActivity() {

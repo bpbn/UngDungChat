@@ -99,21 +99,21 @@ public class SettingActivity extends AppCompatActivity {
         String status = binding.profileStatus.getText().toString();
 
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this, "Please write your user name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng viết tên người dùng", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(status)) {
-            Toast.makeText(this, "Please write your status", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng viết trạng thái", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        loadingBar.setTitle("Updating Profile");
-        loadingBar.setMessage("Please wait while we are updating your profile...");
+        loadingBar.setTitle("Đang cập nhật hồ sơ");
+        loadingBar.setMessage("Vui lòng đợi trong khi chúng tôi đang cập nhật hồ sơ của bạn...");
         loadingBar.setCanceledOnTouchOutside(false);
         loadingBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                Toast.makeText(SettingActivity.this, "Please complete all fields before updating your profile", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingActivity.this, "Vui lòng điền các thông tin trước khi cập nhật hồ sơ", Toast.LENGTH_SHORT).show();
             }
         });
         loadingBar.show();
@@ -131,13 +131,13 @@ public class SettingActivity extends AppCompatActivity {
                                     String downloadUrl = task.getResult().toString();
                                     saveUserInfo(name, status, downloadUrl);
                                 } else {
-                                    Toast.makeText(SettingActivity.this, "Failed to get download URL: " + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SettingActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
                                     loadingBar.dismiss();
                                 }
                             }
                         });
                     } else {
-                        Toast.makeText(SettingActivity.this, "Error: " + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
                         loadingBar.dismiss();
                     }
                 }
@@ -162,10 +162,10 @@ public class SettingActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             sendUserToMainActivity();
-                            Toast.makeText(SettingActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingActivity.this, "Hồ sơ được cập nhật thành công", Toast.LENGTH_SHORT).show();
                         } else {
                             String message = task.getException().toString();
-                            Toast.makeText(SettingActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingActivity.this, "Không thể cập nhật được hồ sơ", Toast.LENGTH_SHORT).show();
                         }
                         loadingBar.dismiss();
                     }
@@ -194,7 +194,7 @@ public class SettingActivity extends AppCompatActivity {
                                 Picasso.get().load(currentProfileImageUrl).into(binding.profileImage);
                             }
                         } else {
-                            Toast.makeText(SettingActivity.this, "Please set your profile information", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingActivity.this, "Vui lòng nhập thông tin hồ sơ của bạn", Toast.LENGTH_SHORT).show();
                         }
                     }
 

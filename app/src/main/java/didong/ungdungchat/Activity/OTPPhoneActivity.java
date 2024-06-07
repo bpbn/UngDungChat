@@ -47,7 +47,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         String phoneNumber = getIntent().getStringExtra("phoneNumber");
-        binding.verify.setText("Verify " + phoneNumber);
+        binding.verify.setText("Xác minh: " + phoneNumber);
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
                 .setPhoneNumber(phoneNumber)
@@ -58,7 +58,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
 //                        signInWithPhoneAuthCredential(phoneAuthCredential);
                         loaddialog.dismiss();
-                        Toast.makeText(OTPPhoneActivity.this, "OTP Received", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(OTPPhoneActivity.this, "Đã nhận được mã OTP", Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -74,7 +74,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
                         loaddialog.dismiss();
                         verificationId = verifyId;
                         mResentToken = forceResendingToken;
-                        Toast.makeText(OTPPhoneActivity.this, "OTP Sent", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(OTPPhoneActivity.this, "Đã gửi OTP", Toast.LENGTH_SHORT).show();
                     }
                 }).build();
         PhoneAuthProvider.verifyPhoneNumber(options);
@@ -83,12 +83,12 @@ public class OTPPhoneActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String otp = binding.otpView.getText().toString();
                 if (otp != null && !otp.isEmpty()) {
-                    loaddialog.setMessage("Verifying OTP...");
+                    loaddialog.setMessage("Xác minh OTP...");
                     loaddialog.show();
                     PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
                     signInWithPhoneAuthCredential(credential);
                 } else {
-                    Toast.makeText(OTPPhoneActivity.this, "Please enter the OTP", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OTPPhoneActivity.this, "Vui lòng nhập mã OTP", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -106,7 +106,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        loaddialog.setMessage("Verifying OTP...");
+        loaddialog.setMessage("Xác minh OTP...");
         loaddialog.show();
 
         mAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -114,7 +114,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 loaddialog.dismiss();
                 if (task.isSuccessful()) {
-                    Toast.makeText(OTPPhoneActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OTPPhoneActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                     sendUserToMainActivity();
                 } else {
                     handleSignInFailure(task.getException());
@@ -129,14 +129,14 @@ public class OTPPhoneActivity extends AppCompatActivity {
             FirebaseAuthException authException = (FirebaseAuthException) e;
             String errorCode = authException.getErrorCode();
             if ("ERROR_TOO_MANY_REQUESTS".equals(errorCode)) {
-                Toast.makeText(OTPPhoneActivity.this, "Too many requests. Please try again later.", Toast.LENGTH_LONG).show();
+                Toast.makeText(OTPPhoneActivity.this, "Quá nhiều yêu cầu. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show();
                 return;
             } else if ("ERROR_QUOTA_EXCEEDED".equals(errorCode)) {
-                Toast.makeText(OTPPhoneActivity.this, "SMS quota exceeded. Please try again later.", Toast.LENGTH_LONG).show();
+                Toast.makeText(OTPPhoneActivity.this, "Vượt chỉ tiêu SMS. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show();
                 return;
             }
         }
-        Toast.makeText(OTPPhoneActivity.this, "Verification Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(OTPPhoneActivity.this, "Xác minh thất bại", Toast.LENGTH_LONG).show();
     }
 
     private void handleSignInFailure(Exception e) {
@@ -144,11 +144,11 @@ public class OTPPhoneActivity extends AppCompatActivity {
             FirebaseAuthException authException = (FirebaseAuthException) e;
             String errorCode = authException.getErrorCode();
             if ("ERROR_TOO_MANY_REQUESTS".equals(errorCode)) {
-                Toast.makeText(OTPPhoneActivity.this, "Too many requests. Please try again later.", Toast.LENGTH_LONG).show();
+                Toast.makeText(OTPPhoneActivity.this, "Quá nhiều yêu cầu. Vui lòng thử lại sau.", Toast.LENGTH_LONG).show();
                 return;
             }
         }
-        Toast.makeText(OTPPhoneActivity.this, "Login Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(OTPPhoneActivity.this, "Đăng nhập thất bại", Toast.LENGTH_LONG).show();
     }
 
     private void sendUserToMainActivity() {
