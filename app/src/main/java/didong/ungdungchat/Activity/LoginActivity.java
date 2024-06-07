@@ -94,10 +94,14 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     private void SignInGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -120,13 +124,23 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             if (task.isSuccessful()) {
+                                String currentUserID = mAuth.getCurrentUser().getUid();
+                                FirebaseMessaging.getInstance().getToken()
+                                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<String> task) {
+                                                if (task.isSuccessful()) {
+                                                    UsersRef.child(currentUserID).child("device_token")
+                                                            .setValue(task.getResult());
+                                                }
+                                            }
+                                        });
                                 sendUserToMainActivity();
                                 loading.dismiss();
                             } else {
                                 String error = task.getException().toString();
                                 Toast.makeText(LoginActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
-
                             }
                         }
                     }
