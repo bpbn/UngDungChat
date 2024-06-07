@@ -28,20 +28,20 @@ public class PhoneLoginActivity extends AppCompatActivity {
                 String phoneNumber = binding.loginPhone.getText().toString().trim();
 
                 if (phoneNumber.isEmpty()) {
-                    binding.loginPhone.setError("Phone number is required");
+                    binding.loginPhone.setError("Vui lòng nhập số điện thoại");
                     return;
                 }
 
                 if (!phoneNumber.startsWith("0")) {
-                    binding.loginPhone.setError("Phone number is incorrect");
+                    binding.loginPhone.setError("Số điện thoại không chính xác");
                     return;
                 }
 
                 if (phoneNumber.length() < 10 || phoneNumber.length() >= 11) {
-                    binding.loginPhone.setError("Phone number must be 10 digits");
+                    binding.loginPhone.setError("Số điện thoại phải có 10 chữ số");
                     return;
                 }
-                
+
                 if(phoneNumber.startsWith("0"))
                 {
                     phoneNumber = "+84" + phoneNumber.substring(1);

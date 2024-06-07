@@ -57,18 +57,18 @@ public class RegisterActivity extends AppCompatActivity {
         String password = binding.registerPassword.getText().toString();
         if(TextUtils.isEmpty(email))
         {
-            binding.registerEmail.setError("Email is required");
+            binding.registerEmail.setError("Vui lòng nhập email");
             return;
         }
         if(TextUtils.isEmpty(password))
         {
-            binding.registerPassword.setError("Password is required");
+            binding.registerPassword.setError("Vui lòng nhập mật khẩu");
             return;
         }
         else
         {
-            loading.setTitle("Creating New Account");
-            loading.setMessage("Please wait...");
+            loading.setTitle("Đang tạo tài khoản mới");
+            loading.setMessage("Vui lòng đợi...");
             loading.setCanceledOnTouchOutside(true);
             loading.show();
 
@@ -87,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
 //                                                    sendUserToMainActivity();
-                                                    Toast.makeText(RegisterActivity.this, "Account created successfully. Please verify your email id.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(RegisterActivity.this, "Tài khoản được tạo thành công. Vui lòng xác minh email của bạn.", Toast.LENGTH_SHORT).show();
                                                     loading.dismiss();
                                                 }
 
@@ -96,13 +96,13 @@ public class RegisterActivity extends AppCompatActivity {
 
 //                                sendUserToMainActivity();
                                 sendUserToLoginActivity();
-                                Toast.makeText(RegisterActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "Tạo mới tài khoản thành công", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                             }
                             else
                             {
                                 String error = task.getException().toString();
-                                Toast.makeText(RegisterActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "Không thể tạo tài khoản", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                             }
                         }
