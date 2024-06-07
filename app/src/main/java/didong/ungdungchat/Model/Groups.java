@@ -1,7 +1,15 @@
 package didong.ungdungchat.Model;
 
 public class Groups {
-    String name, image;
+    String name, image, groupID;
+
+    public String getGroupID() {
+        return groupID;
+    }
+
+    public void setGroupID(String groupID) {
+        this.groupID = groupID;
+    }
 
     public String getName() {
         return name;
@@ -22,8 +30,9 @@ public class Groups {
     public Groups() {
     }
 
-    public Groups(String name, String image) {
+    public Groups(String name, String image, String groupID) {
         this.name = name;
         this.image = image;
+        this.groupID = groupID;
     }
 }

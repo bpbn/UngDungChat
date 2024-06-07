@@ -234,22 +234,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CreateNewGroup(String groupName) {
-         GroupRef = RootRef.child("Groups").child(groupName);
-         //String groupKey = GroupRef.push().getKey();
-         GroupRef.setValue("").addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            GroupRef.child("members").child(currentUserID).child("name").setValue(currentUserName)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    Toast.makeText(MainActivity.this,groupName + " group is Created Successful",Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                        }
-                    }
-                });
+        String groupKey = RootRef.child("Groups").push().getKey();
+        GroupRef = RootRef.child("Groups").child(groupKey);
+
+        HashMap<String, Object> groupInfoMap = new HashMap<>();
+        groupInfoMap.put("name", groupName);
+        groupInfoMap.put("groupID", groupKey);
+
+        GroupRef.setValue(groupInfoMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    GroupRef.child("members").child(currentUserID).child("name").setValue(currentUserName)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(MainActivity.this, groupName + " group is Created Successfully", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                } else {
+                    Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 
