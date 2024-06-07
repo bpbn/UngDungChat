@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -168,6 +169,16 @@ public class SettingActivity extends AppCompatActivity {
                             Toast.makeText(SettingActivity.this, "Không thể cập nhật được hồ sơ", Toast.LENGTH_SHORT).show();
                         }
                         loadingBar.dismiss();
+                    }
+                });
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful()) {
+                            RootRef.child("Users").child(currentUserID).child("device_token")
+                                    .setValue(task.getResult());
+                        }
                     }
                 });
     }
