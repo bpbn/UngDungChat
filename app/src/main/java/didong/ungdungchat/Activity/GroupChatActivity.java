@@ -1,9 +1,12 @@
 package didong.ungdungchat.Activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
@@ -13,6 +16,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -51,7 +55,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
-    private String currentGroupName, currentUserID, currentUserName, currentDate, currentTime;
+    private String currentGroupName,currentGroupID, currentUserID, currentUserName, currentDate, currentTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +69,13 @@ public class GroupChatActivity extends AppCompatActivity {
 //        });
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
+        currentGroupID = getIntent().getExtras().get("groupID").toString();
         Toast.makeText(GroupChatActivity.this, currentGroupName,Toast.LENGTH_SHORT).show();
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+        GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
         InitializeFields();
         GetUserInfo();
@@ -116,17 +121,15 @@ public class GroupChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        GroupNameRef.addChildEventListener(new ChildEventListener() {
+        GroupNameRef.child(currentGroupID).child("messages").addChildEventListener(new ChildEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(!snapshot.getKey().equals("members")){
-                    GroupMessages groupMessages = snapshot.getValue(GroupMessages.class);
-                    if(groupMessages != null){
-                        groupMessagesList.add(groupMessages);
-                        groupMessagesAdapter.notifyDataSetChanged();
-                        binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
-                    }
+                GroupMessages groupMessages = snapshot.getValue(GroupMessages.class);
+                if(groupMessages != null){
+                    groupMessagesList.add(groupMessages);
+                    groupMessagesAdapter.notifyDataSetChanged();
+                    binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
                 }
 
             }
@@ -177,7 +180,6 @@ public class GroupChatActivity extends AppCompatActivity {
     }
     private void SaveMessageInfoToDatabase() {
         String message = binding.inputGroupMessage.getText().toString();
-        String messageKey = GroupNameRef.push().getKey();
         if(TextUtils.isEmpty(message)){
             Toast.makeText(GroupChatActivity.this,"Please write message first...", Toast.LENGTH_SHORT).show();
         }
@@ -190,10 +192,8 @@ public class GroupChatActivity extends AppCompatActivity {
             SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm");
             currentTime = currentTimeFormat.format(calendarTime.getTime());
 
-            HashMap<String, Object> groupMessageKey = new HashMap<>();
-            GroupNameRef.updateChildren(groupMessageKey);
-
-            GroupMessageKeyRef = GroupNameRef.child(messageKey);
+            String messageKey = GroupNameRef.child(currentGroupID).child("messages").push().getKey();
+            GroupMessageKeyRef = GroupNameRef.child(currentGroupID).child("messages").child(messageKey);
             HashMap<String, Object> messageInfoMap = new HashMap<>();
                 messageInfoMap.put("from", currentUserID);
                 messageInfoMap.put("type", "text");
@@ -204,5 +204,43 @@ public class GroupChatActivity extends AppCompatActivity {
             GroupMessageKeyRef.updateChildren(messageInfoMap);
 
         }
+    }
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.option_menu_group_chat, menu);
+        if(menu instanceof MenuBuilder){
+            ((MenuBuilder) menu).setOptionalIconsVisible(true);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+        if(item.getItemId() == R.id.miAddMember)
+        {
+            sendUserToAddMemberActivity();
+        }
+//        if(item.getItemId() == R.id.miListMembers)
+//        {
+//
+//        }
+//        if(item.getItemId() == R.id.miCaiDat)
+//        {
+//
+//        }
+//        if(item.getItemId() == R.id.miLogOut)
+//        {
+//
+//        }
+        return true;
+    }
+
+    private void sendUserToAddMemberActivity() {
+        Intent intent = new Intent(GroupChatActivity.this, AddMemberActivity.class);
+        intent.putExtra("groupID", currentGroupID);
+        startActivity(intent);
     }
 }

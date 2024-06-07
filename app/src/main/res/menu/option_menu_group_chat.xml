@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/miAddMember"
+        android:icon="@drawable/baseline_group_add_24"
+        android:title="Thêm thành viên"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/miListMembers"
+        android:icon="@drawable/baseline_group_24"
+        android:title="Danh sách thành viên"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/miCaiDat"
+        android:icon="@drawable/baseline_settings_24"
+        android:title="Cài đặt"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/miLogOut"
+        android:icon="@drawable/baseline_logout_24"
+        android:title="Rời khỏi nhóm"
+        app:showAsAction="never"
+        />
+</menu>

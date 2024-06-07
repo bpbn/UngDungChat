@@ -57,8 +57,11 @@ public class GroupsFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Groups groups = (Groups) parent.getItemAtPosition(position);
                 String currentGroupName = groups.getName();
+                String currentGroupID = groups.getGroupID();
+
                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                 groupChatIntent.putExtra("groupName", currentGroupName);
+                groupChatIntent.putExtra("groupID", currentGroupID);
                 startActivity(groupChatIntent);
             }
         });
@@ -77,9 +80,7 @@ public class GroupsFragment extends Fragment {
                 listGroup.clear();
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()){
                     if (dataSnapshot.child("members").child(currentUserID).exists()) {
-                        Groups gr = new Groups();
-                        String name = dataSnapshot.getKey();
-                        gr.setName(name);
+                        Groups gr = dataSnapshot.getValue(Groups.class);
                         listGroup.add(gr);
                     }
                 }
