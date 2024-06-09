@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -28,8 +31,10 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import didong.ungdungchat.Adapter.GroupMessagesAdapter;
 import didong.ungdungchat.Fragment.ChatsFragment;
 import didong.ungdungchat.Model.Contacts;
 import didong.ungdungchat.R;
@@ -45,6 +50,7 @@ public class AddMemberActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     String currentUserID, currentGroupID;
     private List<Contacts> contactsList = new ArrayList<>();
+    private List<String> selectedUserIDs = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +70,15 @@ public class AddMemberActivity extends AppCompatActivity {
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupMembersRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID);
         binding.listContact.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+        initializeFields();
+
+        binding.addMember.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addMembers();
+            }
+        });
     }
 
     @Override
@@ -78,7 +93,7 @@ public class AddMemberActivity extends AppCompatActivity {
                 final String usersIDs = getRef(i).getKey();
                 final String[] retImage = {"default_image"};
                 // Kiểm tra xem người dùng có trong danh sách thành viên của nhóm không
-                GroupMembersRef.child("members").addListenerForSingleValueEvent(new ValueEventListener() {
+                GroupMembersRef.child("members").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.hasChild(usersIDs)) {
@@ -93,6 +108,17 @@ public class AddMemberActivity extends AppCompatActivity {
 
                                         final String retName = dataSnapshot.child("name").getValue().toString();
                                         holder.userName.setText(retName);
+
+                                        holder.userCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                if (isChecked) {
+                                                    selectedUserIDs.add(usersIDs);
+                                                } else {
+                                                    selectedUserIDs.remove(usersIDs);
+                                                }
+                                            }
+                                        });
                                     }
                                 }
 
@@ -124,15 +150,39 @@ public class AddMemberActivity extends AppCompatActivity {
         adapter.startListening();
     }
 
+    private void initializeFields() {
+        setSupportActionBar(binding.membersGroupChatBarLayout);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Thêm thành viên");
+    }
 
+    private void addMembers() {
+        for (String userID : selectedUserIDs) {
+            UsersRef.child(userID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists() && snapshot.hasChild("name")) {
+                        String userName = snapshot.child("name").getValue().toString();
+                        GroupMembersRef.child("members").child(userID).child("name").setValue(userName);
+                        Toast.makeText(AddMemberActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    }
 
     public static class ContactsViewHolder extends RecyclerView.ViewHolder {
         CircleImageView profileImage;
         TextView userName;
+        CheckBox userCheck;
         public ContactsViewHolder(ContactListGroupLayoutBinding itemView) {
             super(itemView.getRoot());
             profileImage = itemView.usersProfileImage;
             userName = itemView.userProfileName;
+            userCheck = itemView.userCheck;
         }
     }
 }
