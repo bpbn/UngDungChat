@@ -45,6 +45,7 @@ import didong.ungdungchat.Model.GroupMessages;
 import didong.ungdungchat.Model.Messages;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityGroupChatBinding;
+import didong.ungdungchat.databinding.FragmentGroupsBinding;
 
 public class GroupChatActivity extends AppCompatActivity {
 
@@ -231,10 +232,10 @@ public class GroupChatActivity extends AppCompatActivity {
 //        {
 //
 //        }
-//        if(item.getItemId() == R.id.miLogOut)
-//        {
-//
-//        }
+        if(item.getItemId() == R.id.miLogOut)
+        {
+            removeUserFromGroup();
+        }
         return true;
     }
 
@@ -242,5 +243,17 @@ public class GroupChatActivity extends AppCompatActivity {
         Intent intent = new Intent(GroupChatActivity.this, AddMemberActivity.class);
         intent.putExtra("groupID", currentGroupID);
         startActivity(intent);
+    }
+
+    private void removeUserFromGroup() {
+        GroupNameRef.child(currentGroupID).child("members").child(currentUserID).removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(GroupChatActivity.this, "You have been removed from the group", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GroupChatActivity.this, FragmentGroupsBinding.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(GroupChatActivity.this, "Error occurred while removing from the group", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
