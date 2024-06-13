@@ -143,7 +143,22 @@ public class ListMemberActivity extends AppCompatActivity {
         builder.setTitle("Chỉnh sửa biệt danh ");
 
         final EditText nickNameField = new EditText(ListMemberActivity.this);
-        nickNameField.setText(userName);
+        GroupMembersRef.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists() && snapshot.hasChild("nickname")) {
+                    String nickname = snapshot.child("nickname").getValue().toString();
+                    nickNameField.setText(nickname);
+                } else {
+                    nickNameField.setText(userName);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors.
+            }
+        });
+
         builder.setView(nickNameField);
 
         builder.setPositiveButton("ĐẶT", new DialogInterface.OnClickListener() {

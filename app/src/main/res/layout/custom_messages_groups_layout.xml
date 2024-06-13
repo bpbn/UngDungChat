@@ -39,6 +39,7 @@
         android:textSize="14sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:layout_marginRight="15dp"
         />
 
 
@@ -66,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:layout_alignParentTop="@+id/receiver_message_groups_text"
         android:background="@drawable/sender_messages_layout"
         android:text="sender messages"
@@ -74,6 +75,8 @@
         android:padding="10dp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="5dp"
         />
 
 </RelativeLayout>

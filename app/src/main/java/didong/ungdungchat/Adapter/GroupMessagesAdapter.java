@@ -33,12 +33,12 @@ import didong.ungdungchat.databinding.CustomMessagesLayoutBinding;
 public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdapter.GroupMessagesViewHolder> {
     private List<GroupMessages> groupMessagesList;
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef;
-    private String currentGroupName;
+    private DatabaseReference usersRef, groupMemberRef;
+    private String currentGroupID;
 
-    public GroupMessagesAdapter(List<GroupMessages> groupMessagesList) {
+    public GroupMessagesAdapter(List<GroupMessages> groupMessagesList, String currentGroupID) {
         this.groupMessagesList = groupMessagesList;
-    }
+        this.currentGroupID = currentGroupID;  }
 
     @NonNull
     @Override
@@ -59,6 +59,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
         String fromMessageType = groupMessages.getType();
 
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(fromUserID);
+        groupMemberRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID).child("members");
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
@@ -105,13 +106,22 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                     groupMessagesViewHolder.txtReceiverMess.setBackgroundResource(R.drawable.receiver_messages_layout);
                     groupMessagesViewHolder.txtReceiverMess.setTextColor(Color.BLACK);
                     groupMessagesViewHolder.txtReceiverMess.setText(groupMessages.getMessage() + "\n \n" + groupMessages.getTime() + " - " + groupMessages.getDate());
-                    if(groupMessages.getNickname() != null){
-                        groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getNickname());
-                    }
-                    else {
-                        groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
-                    }
+                    groupMemberRef.child(fromUserID).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists() && snapshot.hasChild("nickname")) {
+                                String nickname = snapshot.child("nickname").getValue().toString();
+                                groupMessagesViewHolder.txtReceiverName.setText(nickname);
+                            } else {
+                                groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            // Handle possible errors.
+                        }
+                    });
                 }
             }
         }
