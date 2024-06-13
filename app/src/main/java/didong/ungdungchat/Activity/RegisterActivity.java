@@ -56,9 +56,13 @@ public class RegisterActivity extends AppCompatActivity {
     private void CreateNewAccount() {
         String email = binding.registerEmail.getText().toString();
         String password = binding.registerPassword.getText().toString();
-        if(TextUtils.isEmpty(email))
-        {
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        if (TextUtils.isEmpty(email)) {
             binding.registerEmail.setError("Vui lòng nhập email");
+            return;
+        }
+        if (!email.matches(emailPattern)) {
+            binding.registerEmail.setError("Email không hợp lệ");
             return;
         }
         if(TextUtils.isEmpty(password))

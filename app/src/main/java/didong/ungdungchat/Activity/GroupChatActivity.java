@@ -127,12 +127,11 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 GroupMessages groupMessages = snapshot.getValue(GroupMessages.class);
-                if(groupMessages != null){
+                if(groupMessages != null && !groupMessagesList.contains(groupMessages)){
                     groupMessagesList.add(groupMessages);
                     groupMessagesAdapter.notifyDataSetChanged();
                     binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
                 }
-
             }
 
             @Override
@@ -160,7 +159,7 @@ public class GroupChatActivity extends AppCompatActivity {
         setSupportActionBar(binding.groupChatBarLayout);
         Objects.requireNonNull(getSupportActionBar()).setTitle(currentGroupName);
 
-        groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList);
+        groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList, currentGroupID);
         linearLayoutManager = new LinearLayoutManager(this);
         binding.groupsMessagesListOfUsers.setLayoutManager(linearLayoutManager);
         binding.groupsMessagesListOfUsers.setAdapter(groupMessagesAdapter);
@@ -197,32 +196,14 @@ public class GroupChatActivity extends AppCompatActivity {
 
             String messageKey = GroupNameRef.child(currentGroupID).child("messages").push().getKey();
             GroupMessageKeyRef = GroupNameRef.child(currentGroupID).child("messages").child(messageKey);
-            GroupNameRef.child(currentGroupID).child("members").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        String nickname = snapshot.child("nickname").getValue(String.class);
-                        if (TextUtils.isEmpty(nickname)) {
-                            nickname = currentUserName;
-                        }
-
-                        HashMap<String, Object> messageInfoMap = new HashMap<>();
-                            messageInfoMap.put("from", currentUserID);
-                            messageInfoMap.put("type", "text");
-                            messageInfoMap.put("name", currentUserName);
-                            messageInfoMap.put("message", message);
-                            messageInfoMap.put("date", currentDate);
-                            messageInfoMap.put("time", currentTime);
-                            messageInfoMap.put("nickname", nickname != null ? nickname : "");
-                        GroupMessageKeyRef.updateChildren(messageInfoMap);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(GroupChatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            HashMap<String, Object> messageInfoMap = new HashMap<>();
+                messageInfoMap.put("from", currentUserID);
+                messageInfoMap.put("type", "text");
+                messageInfoMap.put("name", currentUserName);
+                messageInfoMap.put("message", message);
+                messageInfoMap.put("date", currentDate);
+                messageInfoMap.put("time", currentTime);
+            GroupMessageKeyRef.updateChildren(messageInfoMap);
 
         }
     }

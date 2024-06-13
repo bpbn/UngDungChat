@@ -7,6 +7,8 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.ArrayList;
 
 import didong.ungdungchat.databinding.ActivityPhoneLoginBinding;
@@ -22,6 +24,8 @@ public class PhoneLoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         binding.loginPhone.requestFocus();
+        // Force reCAPTCHA flow
+        FirebaseAuth.getInstance().getFirebaseAuthSettings().forceRecaptchaFlowForTesting(true);
         binding.btnSendVerifycation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

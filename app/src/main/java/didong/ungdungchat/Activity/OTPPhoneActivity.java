@@ -23,8 +23,6 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.mukeshsolanki.OnOtpCompletionListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -62,10 +60,8 @@ public class OTPPhoneActivity extends AppCompatActivity {
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-//                        signInWithPhoneAuthCredential(phoneAuthCredential);
                         loaddialog.dismiss();
                         Toast.makeText(OTPPhoneActivity.this, "Đã nhận được mã OTP", Toast.LENGTH_SHORT).show();
-
                     }
 
                     @Override
@@ -84,6 +80,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
                     }
                 }).build();
         PhoneAuthProvider.verifyPhoneNumber(options);
+
         binding.btnSendVerifycation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,18 +117,7 @@ public class OTPPhoneActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 loaddialog.dismiss();
                 if (task.isSuccessful()) {
-                    String currentUserID = mAuth.getCurrentUser().getUid();
-                    FirebaseMessaging.getInstance().getToken()
-                            .addOnCompleteListener(new OnCompleteListener<String>() {
-                                @Override
-                                public void onComplete(@NonNull Task<String> task) {
-                                    if (task.isSuccessful()) {
-                                        UsersRef.child(currentUserID).child("device_token")
-                                                .setValue(task.getResult());
-                                    }
-                                }
-                            });
-                    Toast.makeText(OTPPhoneActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OTPPhoneActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
                     sendUserToMainActivity();
                 } else {
                     handleSignInFailure(task.getException());
@@ -139,7 +125,6 @@ public class OTPPhoneActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void handleVerificationFailure(FirebaseException e) {
         if (e instanceof FirebaseAuthException) {
@@ -176,7 +161,6 @@ public class OTPPhoneActivity extends AppCompatActivity {
         } else {
             Toast.makeText(OTPPhoneActivity.this, "Đăng nhập thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-        // Thêm logcat để xem lỗi chi tiết
         Log.e("OTPPhoneActivity", "Sign-in failed", e);
     }
 

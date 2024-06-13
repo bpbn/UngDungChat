@@ -8,6 +8,11 @@
     android:orientation="vertical"
     android:padding="15dp"
     tools:context=".Activity.SettingActivity">
+    <include
+        layout="@layout/app_bar_layout"
+        android:id="@+id/setting_toolbar"
+        >
+    </include>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"

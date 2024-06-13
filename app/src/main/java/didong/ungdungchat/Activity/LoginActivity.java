@@ -89,7 +89,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SignInGoogle();
-//                sendUserToGoogleActivity();
+            }
+        });
+        binding.forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendUserToForgotPasswordActivity();
             }
         });
     }
@@ -150,9 +155,13 @@ public class LoginActivity extends AppCompatActivity {
     private void AllowUserToLogin() {
         String email = binding.loginEmail.getText().toString().trim();
         String password = binding.loginPassword.getText().toString().trim();
-
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         if (TextUtils.isEmpty(email)) {
             binding.loginEmail.setError("Vui lòng nhập email");
+            return;
+        }
+        if (!email.matches(emailPattern)) {
+            binding.loginEmail.setError("Email không hợp lệ");
             return;
         }
         if (TextUtils.isEmpty(password)) {
@@ -223,6 +232,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void sendUserToRegisterActivity() {
         Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
+    }
+
+    private void sendUserToForgotPasswordActivity() {
+        Intent intent = new Intent(this, ForgotPasswordActivity.class);
         startActivity(intent);
     }
 
