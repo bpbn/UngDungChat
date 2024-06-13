@@ -254,7 +254,7 @@ public class ChatActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(messageText))
         {
-            Toast.makeText(this, "first write your message...", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "first write your message...", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -282,7 +282,7 @@ public class ChatActivity extends AppCompatActivity {
             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task -> {
                 if (task.isSuccessful())
                 {
-                    Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
