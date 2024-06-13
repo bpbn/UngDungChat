@@ -24,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -96,7 +98,41 @@ public class ChatsFragment extends Fragment {
                                         }
                                         else if (state.equals("offline"))
                                         {
-                                            holder.userStatus.setText("Last Seen: " + date + " " + time);
+                                            SimpleDateFormat now = new SimpleDateFormat("dd/MM/yyyy");
+                                            String currentDate = now.format(Calendar.getInstance().getTime());
+                                            if (currentDate.equals(date)) {
+                                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                                try {
+                                                    long time1 = Objects.requireNonNull(sdf.parse(time)).getTime();
+                                                    long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
+                                                    long diff = time2 - time1;
+                                                    if (diff < 3600000) {
+                                                        holder.userStatus.setText(diff / 60000 + " phút trước");
+                                                    } else if (diff < 86400000) {
+                                                        holder.userStatus.setText(diff / 3600000 + " giờ trước");
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            if (!currentDate.equals(date)) {
+                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                                try {
+                                                    long time1 = Objects.requireNonNull(sdf.parse(date)).getTime();
+                                                    long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
+                                                    long diff = time2 - time1;
+                                                    if (diff < 86400000) {
+                                                        holder.userStatus.setText("Hôm qua");
+                                                    } else {
+                                                        holder.userStatus.setText(diff / 86400000 + " ngày trước");
+                                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            if (state.equals("online")) {
+                                                holder.userStatus.setText("online");
+                                            }
                                         }
                                     }
                                     else

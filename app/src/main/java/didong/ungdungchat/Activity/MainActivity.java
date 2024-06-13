@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef, GroupRef;
-    private String currentUserID, currentUserName;
+    private String currentUserID, currentUserName, cUID;
     GoogleSignInClient mGoogleSignInClient;
 
     @Override
@@ -161,9 +161,9 @@ public class MainActivity extends AppCompatActivity {
 
         else
         {
-            updateUserStatus("online");
             VerifyUserExistance();
             GetUserInfo();
+            updateUserStatus("online");
         }
     }
 
@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        cUID = currentUserID;
     }
 
     private void CreateNewGroup(String groupName) {
@@ -348,10 +349,7 @@ public class MainActivity extends AppCompatActivity {
         onlineStateMap.put("time", saveCurrentTime);
         onlineStateMap.put("date", saveCurrentDate);
         onlineStateMap.put("state", state);
-
-        currentUserID = mAuth.getCurrentUser().getUid();
-
-        RootRef.child("Users").child(currentUserID).child("userState")
+        RootRef.child("Users").child(cUID).child("userState")
                 .updateChildren(onlineStateMap);
 
     }
