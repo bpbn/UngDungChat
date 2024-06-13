@@ -203,6 +203,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 messageInfoMap.put("message", message);
                 messageInfoMap.put("date", currentDate);
                 messageInfoMap.put("time", currentTime);
+                messageInfoMap.put("messageID", messageKey);
             GroupMessageKeyRef.updateChildren(messageInfoMap);
 
         }

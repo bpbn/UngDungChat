@@ -1,7 +1,22 @@
 package didong.ungdungchat.Model;
 
 public class GroupMessages {
-    private String name, message, date, time, from, type;
+    private String name;
+    private String message;
+    private String date;
+    private String time;
+    private String from;
+    private String type;
+
+    public String getMessageID() {
+        return messageID;
+    }
+
+    public void setMessageID(String messageID) {
+        this.messageID = messageID;
+    }
+
+    private String messageID;
 
     public String getType() {
         return type;
@@ -54,12 +69,13 @@ public class GroupMessages {
     public GroupMessages() {
     }
 
-    public GroupMessages(String name, String message, String date, String time, String from, String type) {
+    public GroupMessages(String name, String message, String date, String time, String from, String type, String messageID) {
         this.name = name;
         this.message = message;
         this.date = date;
         this.time = time;
         this.from = from;
         this.type = type;
+        this.messageID = messageID;
     }
 }
