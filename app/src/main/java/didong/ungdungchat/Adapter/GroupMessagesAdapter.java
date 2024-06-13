@@ -105,7 +105,13 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                     groupMessagesViewHolder.txtReceiverMess.setBackgroundResource(R.drawable.receiver_messages_layout);
                     groupMessagesViewHolder.txtReceiverMess.setTextColor(Color.BLACK);
                     groupMessagesViewHolder.txtReceiverMess.setText(groupMessages.getMessage() + "\n \n" + groupMessages.getTime() + " - " + groupMessages.getDate());
-                    groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
+                    if(groupMessages.getNickname() != null){
+                        groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getNickname());
+                    }
+                    else {
+                        groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
+                    }
+
                 }
             }
         }

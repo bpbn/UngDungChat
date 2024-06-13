@@ -79,7 +79,7 @@ public class GroupChatActivity extends AppCompatActivity {
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
         InitializeFields();
-        GetUserInfo();
+        getUserInfo();
 
         binding.sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,7 +165,7 @@ public class GroupChatActivity extends AppCompatActivity {
         binding.groupsMessagesListOfUsers.setLayoutManager(linearLayoutManager);
         binding.groupsMessagesListOfUsers.setAdapter(groupMessagesAdapter);
     }
-    private void GetUserInfo() {
+    private void getUserInfo() {
         UsersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -179,6 +179,8 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
     }
+
+
     private void SaveMessageInfoToDatabase() {
         String message = binding.inputGroupMessage.getText().toString();
         if(TextUtils.isEmpty(message)){
@@ -195,14 +197,32 @@ public class GroupChatActivity extends AppCompatActivity {
 
             String messageKey = GroupNameRef.child(currentGroupID).child("messages").push().getKey();
             GroupMessageKeyRef = GroupNameRef.child(currentGroupID).child("messages").child(messageKey);
-            HashMap<String, Object> messageInfoMap = new HashMap<>();
-                messageInfoMap.put("from", currentUserID);
-                messageInfoMap.put("type", "text");
-                messageInfoMap.put("name", currentUserName);
-                messageInfoMap.put("message", message);
-                messageInfoMap.put("date", currentDate);
-                messageInfoMap.put("time", currentTime);
-            GroupMessageKeyRef.updateChildren(messageInfoMap);
+            GroupNameRef.child(currentGroupID).child("members").child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String nickname = snapshot.child("nickname").getValue(String.class);
+                        if (TextUtils.isEmpty(nickname)) {
+                            nickname = currentUserName;
+                        }
+
+                        HashMap<String, Object> messageInfoMap = new HashMap<>();
+                            messageInfoMap.put("from", currentUserID);
+                            messageInfoMap.put("type", "text");
+                            messageInfoMap.put("name", currentUserName);
+                            messageInfoMap.put("message", message);
+                            messageInfoMap.put("date", currentDate);
+                            messageInfoMap.put("time", currentTime);
+                            messageInfoMap.put("nickname", nickname != null ? nickname : "");
+                        GroupMessageKeyRef.updateChildren(messageInfoMap);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(GroupChatActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
         }
     }
@@ -224,10 +244,10 @@ public class GroupChatActivity extends AppCompatActivity {
         {
             sendUserToAddMemberActivity();
         }
-//        if(item.getItemId() == R.id.miListMembers)
-//        {
-//
-//        }
+        if(item.getItemId() == R.id.miListMembers)
+        {
+            showListMember();
+        }
 //        if(item.getItemId() == R.id.miCaiDat)
 //        {
 //
@@ -255,5 +275,10 @@ public class GroupChatActivity extends AppCompatActivity {
                 Toast.makeText(GroupChatActivity.this, "Error occurred while removing from the group", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void showListMember() {
+        Intent intent = new Intent(GroupChatActivity.this, ListMemberActivity.class);
+        intent.putExtra("groupID", currentGroupID);
+        startActivity(intent);
     }
 }

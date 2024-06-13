@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UngDungChat"
         tools:targetApi="31">
+        <activity
+            android:name=".Activity.ListMemberActivity"
+            android:exported="false" />
         <activity
             android:name=".Activity.AddMemberActivity"
             android:exported="false" />
@@ -57,6 +61,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".Services.PushNotificationService"
             android:exported="false">
