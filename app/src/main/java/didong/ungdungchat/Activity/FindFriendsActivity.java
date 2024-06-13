@@ -24,10 +24,16 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import didong.ungdungchat.Model.Contacts;
@@ -40,9 +46,11 @@ public class FindFriendsActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView FindFriendsRecyclerList;
 
-    private DatabaseReference UsersRef;
+    private DatabaseReference UsersRef, ContactRef, ChatRequestsRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
+    private List<String> contactsList= new ArrayList<>();
+    private List<String> requestsSentList = new ArrayList<>();
 
     ActivityFindFriendsBinding binding;
 
@@ -62,6 +70,9 @@ public class FindFriendsActivity extends AppCompatActivity {
 
 
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        ContactRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
+        ChatRequestsRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -72,7 +83,9 @@ public class FindFriendsActivity extends AppCompatActivity {
         setSupportActionBar(binding.findFriendsToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Find Friends");
+        getSupportActionBar().setTitle("Tìm Bạn Bè");
+
+        fetchContactsAndRequestsSent();
 
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -87,22 +100,66 @@ public class FindFriendsActivity extends AppCompatActivity {
                 return false;
             }
         });
-        loadAllFriends();
     }
 
-    private void loadAllFriends() {
-        FirebaseRecyclerOptions<Contacts> options =
-                new FirebaseRecyclerOptions.Builder<Contacts>()
-                        .setQuery(UsersRef, Contacts.class)
-                        .build();
+    private void fetchContactsAndRequestsSent() {
+        // Lấy danh sách UID đã kết bạn
+        ContactRef.child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                contactsList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String contactID = snapshot.getKey();
+                    contactsList.add(contactID);
+                }
+                // Sau khi lấy danh sách, cập nhật danh sách hiển thị
+                updateFriendsList();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi
+            }
+        });
+
+        // Lấy danh sách UID đã gửi lời mời kết bạn
+        ChatRequestsRef.child(currentUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                requestsSentList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String receiverID = snapshot.getKey();
+                    requestsSentList.add(receiverID);
+                }
+                // Sau khi lấy danh sách, cập nhật danh sách hiển thị
+                updateFriendsList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Xử lý khi có lỗi
+            }
+        });
+    }
+
+    private void updateFriendsList() {
+        // Tạo query để lấy danh sách người dùng từ UsersRef
+        Query query = UsersRef.orderByChild("name");
+
+        // Tạo FirebaseRecyclerOptions
+        FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
+                .setQuery(query, Contacts.class)
+                .build();
+
+        // Tạo FirebaseRecyclerAdapter
         FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, int position, @NonNull Contacts model) {
                         String userIDs = getRef(position).getKey();
 
-                        if (!userIDs.equals(currentUserID)) {
+                        // Kiểm tra nếu userIDs không nằm trong danh sách contactsList và requestsSentList và không phải là user đang đăng nhập
+                        if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
                             Picasso.get().load(model.getImage()).into(holder.profileImage);
@@ -117,6 +174,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
+                            // Nếu là bạn bè hoặc đã gửi lời mời kết bạn, ẩn item này đi
                             holder.itemView.setVisibility(View.GONE);
                             holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
                         }
@@ -128,6 +186,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                         return new FindFriendViewHolder(UsersDisplayLayoutBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
                     }
                 };
+
         binding.findFriendsRecyclerList.setAdapter(adapter);
         adapter.startListening();
     }
@@ -135,7 +194,7 @@ public class FindFriendsActivity extends AppCompatActivity {
     private void searchForFriends(String searchText) {
         Query query;
         if (TextUtils.isEmpty(searchText)) {
-            query = UsersRef;
+            query = UsersRef.orderByChild("name");
         } else {
             query = UsersRef.orderByChild("name").startAt(searchText).endAt(searchText + "\uf8ff");
         }
@@ -151,7 +210,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                     protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Contacts model) {
                         String userIDs = getRef(position).getKey();
 
-                        if (!userIDs.equals(currentUserID)) {
+                        if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
                             Picasso.get().load(model.getImage()).into(holder.profileImage);
@@ -196,7 +255,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                     protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Contacts model) {
                         String userIDs = getRef(position).getKey();
 
-                        if (!userIDs.equals(currentUserID)){
+                        if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
                             Picasso.get().load(model.getImage()).into(holder.profileImage);
@@ -205,13 +264,12 @@ public class FindFriendsActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     String visit_user_id = getRef(position).getKey();
-
                                     Intent profileIntent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
                                     profileIntent.putExtra("visit_user_id", visit_user_id);
                                     startActivity(profileIntent);
                                 }
                             });
-                        }else {
+                        } else {
                             holder.itemView.setVisibility(View.GONE);
                             holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
                         }
