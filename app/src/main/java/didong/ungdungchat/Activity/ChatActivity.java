@@ -243,26 +243,50 @@ public class ChatActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        if (dataSnapshot.child("userState").hasChild("state"))
-                        {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child("userState").hasChild("state")) {
                             String state = Objects.requireNonNull(dataSnapshot.child("userState").child("state").getValue()).toString();
                             String date = Objects.requireNonNull(dataSnapshot.child("userState").child("date").getValue()).toString();
                             String time = Objects.requireNonNull(dataSnapshot.child("userState").child("time").getValue()).toString();
-
-                            if (state.equals("online"))
-                            {
+                            SimpleDateFormat now = new SimpleDateFormat("dd/MM/yyyy");
+                            String currentDate = now.format(Calendar.getInstance().getTime());
+                            if (state.equals("offline")) {
+                                if (currentDate.equals(date)) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                    try {
+                                        long time1 = Objects.requireNonNull(sdf.parse(time)).getTime();
+                                        long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
+                                        long diff = time2 - time1;
+                                        if (diff < 3600000) {
+                                            customChatBarBinding.customUserLastSeen.setText(diff / 60000 + " phút trước");
+                                        } else if (diff < 86400000) {
+                                            customChatBarBinding.customUserLastSeen.setText(diff / 3600000 + " giờ trước");
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (!currentDate.equals(date)) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                    try {
+                                        long time1 = Objects.requireNonNull(sdf.parse(date)).getTime();
+                                        long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
+                                        long diff = time2 - time1;
+                                        if (diff < 86400000) {
+                                            customChatBarBinding.customUserLastSeen.setText("Hôm qua");
+                                        } else {
+                                            customChatBarBinding.customUserLastSeen.setText(diff / 86400000 + " ngày trước");
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            } else {
+                                customChatBarBinding.customUserLastSeen.setText("last seen: " + date + " " + time);
+                            }
+                            if (state.equals("online")) {
                                 customChatBarBinding.customUserLastSeen.setText("online");
                             }
-                            else if (state.equals("offline"))
-                            {
-                                customChatBarBinding.customUserLastSeen.setText("Last Seen: " + date + " " + time);
-                            }
-                        }
-                        else
-                        {
-                            customChatBarBinding.customUserLastSeen.setText("offline");
                         }
                     }
 

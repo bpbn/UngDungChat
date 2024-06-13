@@ -70,6 +70,7 @@
         android:layout_toEndOf="@+id/message_profile_image"
         android:orientation="vertical"
         tools:ignore="RelativeOverlap"
+        android:padding="5dp"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="5dp"
