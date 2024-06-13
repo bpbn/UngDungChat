@@ -110,6 +110,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.receiverMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
             }
         }
+        else if (fromMessageType.equals("image"))
+        {
+            if (fromUserID.equals(messageSenderId))
+            {
+                messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
+                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+                messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+                messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+            }
+            else
+            {
+                messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+                messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+            }
+        }
     }
 
 
@@ -125,9 +147,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     public class MessageViewHolder extends RecyclerView.ViewHolder
     {
-        public TextView senderMessageText, receiverMessageText;
+        public TextView senderMessageText, receiverMessageText, senderMessageTime, receiverMessageTime;
         public CircleImageView receiverProfileImage;
         public ImageView messageSenderPicture, messageReceiverPicture;
+        public LinearLayout senderMessageImageLayout, receiverMessageImageLayout;
 
 
         public MessageViewHolder(@NonNull CustomMessagesLayoutBinding itemView)
@@ -139,6 +162,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             receiverProfileImage = itemView.messageProfileImage;
             messageReceiverPicture = itemView.messageReceiverImageView;
             messageSenderPicture = itemView.messageSenderImageView;
+            senderMessageTime = itemView.senderMessageTime;
+            receiverMessageTime = itemView.receiverMessageTime;
+            senderMessageImageLayout = itemView.senderMessageImageLayout;
+            receiverMessageImageLayout = itemView.receiverMessageImageLayout;
         }
     }
 
