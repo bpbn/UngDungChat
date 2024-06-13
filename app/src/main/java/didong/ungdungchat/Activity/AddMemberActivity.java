@@ -1,5 +1,6 @@
 package didong.ungdungchat.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -92,12 +93,12 @@ public class AddMemberActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull ContactsViewHolder holder, int i, @NonNull Contacts contacts) {
                 final String usersIDs = getRef(i).getKey();
                 final String[] retImage = {"default_image"};
-                // Kiểm tra xem người dùng có trong danh sách thành viên của nhóm không
                 GroupMembersRef.child("members").addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (!dataSnapshot.hasChild(usersIDs)) {
-                            UsersRef.child(usersIDs).addListenerForSingleValueEvent(new ValueEventListener() {
+                            UsersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
@@ -136,7 +137,6 @@ public class AddMemberActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // Xử lý khi có lỗi xảy ra
                     }
                 });
             }
@@ -151,13 +151,14 @@ public class AddMemberActivity extends AppCompatActivity {
     }
 
     private void initializeFields() {
-        setSupportActionBar(binding.membersGroupChatBarLayout);
+        setSupportActionBar(binding.contactGroupChatBarLayout);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Thêm thành viên");
     }
 
     private void addMembers() {
         for (String userID : selectedUserIDs) {
             UsersRef.child(userID).addValueEventListener(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists() && snapshot.hasChild("name")) {

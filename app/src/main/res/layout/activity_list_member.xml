@@ -5,10 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.AddMemberActivity">
+    tools:context=".Activity.ListMemberActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/contact_group_chat_bar_layout"
+        android:id="@+id/members_group_chat_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -18,29 +18,10 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_contact"
+        android:id="@+id/list_member"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/contact_group_chat_bar_layout"
+        android:layout_below="@+id/members_group_chat_bar_layout"
         android:layout_marginBottom="6dp"/>
-    <RelativeLayout
-        android:id="@+id/group_chat_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        >
-
-        <Button
-            android:id="@+id/add_member"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:backgroundTint="@color/button"
-            android:text="Thêm"
-            />
-
-    </RelativeLayout>
 
 </RelativeLayout>
