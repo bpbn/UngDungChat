@@ -140,16 +140,16 @@ public class MainActivity extends AppCompatActivity {
         else
         {
             VerifyUserExistance();
-            GetUserInfo();
+//            GetUserInfo();
         }
     }
 
     private void VerifyUserExistance() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            String currentUserId = currentUser.getUid();
+        FirebaseUser currentUser1 = mAuth.getCurrentUser();
+        if (currentUser1 != null) {
+            String currentUserId1 = currentUser1.getUid();
 
-            RootRef.child("Users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            RootRef.child("Users").child(currentUserId1).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
