@@ -158,10 +158,10 @@ public class ChatActivity extends AppCompatActivity {
 
         Calendar calendar = Calendar.getInstance();
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
         saveCurrentDate = currentDate.format(calendar.getTime());
 
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
         saveCurrentTime = currentTime.format(calendar.getTime());
     }
 
