@@ -3,8 +3,10 @@ package didong.ungdungchat.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -61,10 +64,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendUserToRegisterActivity();
-
             }
         });
-
+        binding.loginPassword.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                showPassword((TextInputEditText) v, event);
+                return false;
+            }
+        });
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                 sendUserToForgotPasswordActivity();
             }
         });
+
     }
     private void SignInGoogle() {
         mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -151,11 +160,31 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+    private void showPassword(TextInputEditText editText, MotionEvent event) {
+        final int DRAWABLE_RIGHT = 2;
+
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                // Thay đổi trạng thái hiển thị mật khẩu
+                if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_24, 0);
+                } else {
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_off_24, 0);
+                }
+                editText.setSelection(editText.getText().length()); // Di chuyển con trỏ tới cuối
+            }
+        }
+    }
 
     private void AllowUserToLogin() {
         String email = binding.loginEmail.getText().toString().trim();
         String password = binding.loginPassword.getText().toString().trim();
+
+
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
         if (TextUtils.isEmpty(email)) {
             binding.loginEmail.setError("Vui lòng nhập email");
             return;
@@ -168,6 +197,11 @@ public class LoginActivity extends AppCompatActivity {
             binding.loginPassword.setError("Vui lòng nhập mật khẩu");
             return;
         }
+        if (password.length() < 6) {
+            binding.loginPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
+            return;
+        }
+
 
         loading.setTitle("Đăng nhập");
         loading.setMessage("Vui lòng đợi...");

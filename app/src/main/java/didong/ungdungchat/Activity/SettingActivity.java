@@ -1,12 +1,17 @@
 package didong.ungdungchat.Activity;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,10 +21,20 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,17 +48,21 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivitySettingBinding;
+import didong.ungdungchat.databinding.LayoutChangePasswordBinding;
 
 public class SettingActivity extends AppCompatActivity {
 
     ActivitySettingBinding binding;
+    LayoutChangePasswordBinding changePasswordBinding;
     private String currentUserID;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
     private ActivityResultLauncher<Intent> activityResultLauncher;
     private StorageReference userProfileImageRef;
     private ProgressDialog loadingBar;
+    private Dialog dialog;
     private Uri selectedImageUri; // Store the selected image URI
     private String currentProfileImageUrl; // Store the current profile image URL
 
@@ -51,10 +70,11 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySettingBinding.inflate(getLayoutInflater());
-        setSupportActionBar(binding.settingToolbar.getRoot());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.settingToolbar);
+        dialog = new Dialog(SettingActivity.this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Cài đặt tài khoản");
 
         mAuth = FirebaseAuth.getInstance();
@@ -97,6 +117,136 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         retrieveUserInfo();
+        binding.btnChangPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changePassword();
+                changePasswordBinding.passwordOld.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        showPassword(changePasswordBinding.passwordOld,event);
+                        return false;
+                    }
+                });
+                changePasswordBinding.passwordNew.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        showPassword(changePasswordBinding.passwordNew,event);
+                        return false;
+                        }
+                });
+                changePasswordBinding.passConfirm.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        showPassword(changePasswordBinding.passConfirm, event);
+                        return false;
+                    }
+
+                });
+            }
+        });
+
+
+    }
+    private boolean isPasswordVisible = false;
+
+    private void changePassword() {
+        dialog.setContentView(R.layout.layout_change_password);
+        dialog.setTitle("Đổi mật khẩu");
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show(); // Hiển thị Dialog
+
+        // Gắn changePasswordBinding với layout_change_password
+        changePasswordBinding = LayoutChangePasswordBinding.bind(dialog.findViewById(R.id.change_layout_password));
+
+        changePasswordBinding.btnchangepassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String oldpass = changePasswordBinding.passwordOld.getText().toString();
+                String newpass = changePasswordBinding.passwordNew.getText().toString();
+                String confirmpass = changePasswordBinding.passConfirm.getText().toString();
+
+                if(TextUtils.isEmpty(oldpass))
+                {
+                    changePasswordBinding.passwordOld.setError("Vui lòng nhập mật khẩu cũ");
+                }
+                else if(oldpass.length() < 6)
+                {
+                    changePasswordBinding.passwordOld.setError("Mật khẩu cũ phải có ít nhất 6 ký tự");
+                }
+                else if(TextUtils.isEmpty(newpass))
+                {
+                    changePasswordBinding.passwordNew.setError("Vui lòng nhập mật khẩu mới");
+                }
+                else if(newpass.length() < 6)
+                {
+                    changePasswordBinding.passwordNew.setError("Mật khẩu mới phải có ít nhất 6 ký tự");
+                }
+                else if(TextUtils.isEmpty(confirmpass))
+                {
+                    changePasswordBinding.passConfirm.setError("Vui lòng nhập lại mật khẩu mới");
+                }
+                else if(!newpass.equals(confirmpass))
+                {
+                    changePasswordBinding.passConfirm.setError("Mật khẩu mới không trùng với mật khẩu nhập lại");
+                }
+                else {
+                    updatePassword(oldpass, newpass);
+                }
+
+            }
+        });
+    }
+    private void showPassword(TextInputEditText editText, MotionEvent event) {
+        final int DRAWABLE_RIGHT = 2;
+
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                // Thay đổi trạng thái hiển thị mật khẩu
+                if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_24, 0);
+                } else {
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_off_24, 0);
+                }
+                editText.setSelection(editText.getText().length()); // Di chuyển con trỏ tới cuối
+            }
+        }
+    }
+
+
+    private void updatePassword(String oldpass, String newpass) {
+        loadingBar.show();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), oldpass);
+
+        user.reauthenticate(credential).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                loadingBar.dismiss();
+                user.updatePassword(newpass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(SettingActivity.this, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
+                        loadingBar.dismiss();
+                        dialog.dismiss();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        loadingBar.dismiss();
+                        Toast.makeText(SettingActivity.this, "Mật khẩu cũ không chính xác", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                loadingBar.dismiss();
+                Toast.makeText(SettingActivity.this, "Đổi mật khẩu không thành công", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void updateSettings() {
