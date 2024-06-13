@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -36,6 +38,8 @@ public class FindFriendsActivity extends AppCompatActivity {
     private RecyclerView FindFriendsRecyclerList;
 
     private DatabaseReference UsersRef;
+    private FirebaseAuth mAuth;
+    private String currentUserID;
 
     ActivityFindFriendsBinding binding;
 
@@ -45,6 +49,15 @@ public class FindFriendsActivity extends AppCompatActivity {
         binding = ActivityFindFriendsBinding.inflate(getLayoutInflater());
         EdgeToEdge.enable(this);
         setContentView(binding.getRoot());
+
+        // Khởi tạo FirebaseAuth và lấy thông tin người dùng hiện tại
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            currentUserID = currentUser.getUid();
+        }
+
+
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -72,20 +85,27 @@ public class FindFriendsActivity extends AppCompatActivity {
                 new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Contacts model) {
-                        holder.userName.setText(model.getName());
-                        holder.userStatus.setText(model.getStatus());
-                        Picasso.get().load(model.getImage()).into(holder.profileImage);
+                        String userIDs = getRef(position).getKey();
 
-                        holder.itemView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String visit_user_id = getRef(position).getKey();
+                        if (!userIDs.equals(currentUserID)){
+                            holder.userName.setText(model.getName());
+                            holder.userStatus.setText(model.getStatus());
+                            Picasso.get().load(model.getImage()).into(holder.profileImage);
 
-                                Intent profileIntent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
-                                profileIntent.putExtra("visit_user_id", visit_user_id);
-                                startActivity(profileIntent);
-                            }
-                        });
+                            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String visit_user_id = getRef(position).getKey();
+
+                                    Intent profileIntent = new Intent(FindFriendsActivity.this, ProfileActivity.class);
+                                    profileIntent.putExtra("visit_user_id", visit_user_id);
+                                    startActivity(profileIntent);
+                                }
+                            });
+                        }else {
+                            holder.itemView.setVisibility(View.GONE);
+                            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+                        }
                     }
 
                     @NonNull
