@@ -153,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
                                 loading.dismiss();
                             } else {
                                 String error = task.getException().toString();
-                                Toast.makeText(LoginActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "Lỗi", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                             }
                         }
@@ -173,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                     editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_off_24, 0);
                 }
-                editText.setSelection(editText.getText().length()); // Di chuyển con trỏ tới cuối
+                editText.setSelection(editText.getText().length());
             }
         }
     }
@@ -245,7 +245,7 @@ public class LoginActivity extends AppCompatActivity {
                             } catch (FirebaseAuthEmailException e) {
                                 errorMessage = "Định dạng email không hợp lệ.";
                             } catch (Exception e) {
-                                errorMessage = "Xác thực không thành công: ";
+                                errorMessage = "Xác thực không thành công ";
                             }
                             Log.e("AuthError", errorMessage, task.getException());
                             Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();

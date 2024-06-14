@@ -1,7 +1,10 @@
 package didong.ungdungchat.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +58,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, int i) {
+    public void onBindViewHolder(@NonNull final MessageViewHolder messageViewHolder, @SuppressLint("RecyclerView") int i) {
         String messageSenderId = mAuth.getCurrentUser().getUid();
         Messages messages = userMessagesList.get(i);
 
@@ -147,6 +150,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
                 messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
                 messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+
             } else {
                 messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
@@ -155,69 +159,151 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
                 messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+                        builder.setTitle("Bạn muốn xem ảnh này?");
+                        builder.setPositiveButton("Xem ảnh", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(userMessagesList.get(i).getMessage()));
+                                messageViewHolder.itemView.getContext().startActivity(intent);
+                            }
+                        });
+                        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
+                    }
+                });
+            }
+        }
+        else {
+            if (fromUserID.equals(messageSenderId)) {
+                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+                messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
+                messageViewHolder.messageSenderPicture.setBackgroundResource(R.drawable.baseline_insert_drive_file_24);
+                messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+                messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+                        builder.setTitle("Bạn muốn tải xuống tệp này?");
+
+                        builder.setMessage(userMessagesList.get(i).getName());
+                        builder.setPositiveButton("Tải xuống", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(userMessagesList.get(i).getMessage()));
+                                messageViewHolder.itemView.getContext().startActivity(intent);
+                            }
+                        });
+                        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
+                    }
+                });
+            } else {
+                messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
+                messageViewHolder.messageReceiverPicture.setBackgroundResource(R.drawable.baseline_insert_drive_file_24);
+                messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+                        builder.setTitle("Bạn muốn tải xuống tệp này?");
+                        builder.setMessage(userMessagesList.get(i).getName());
+                        builder.setPositiveButton("Tải xuống", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(userMessagesList.get(i).getMessage()));
+                                messageViewHolder.itemView.getContext().startActivity(intent);
+                            }
+                        });
+                        builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
+                    }
+                });
             }
         }
 
-        if (fromUserID.equals(messageSenderId)) {
-            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (messages.getType().equals("text")) {
-                        CharSequence options[] = new CharSequence[]
-                                {
-                                        "Thu hồi",
-                                        "Gỡ ở phía bạn",
-                                        "Hủy"
-                                };
-                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
-                        builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
-
-                        builder.setItems(options, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                if (position == 0) {
-                                    deleteMessage(i, messageViewHolder);
-                                } else if (position == 1) {
-                                    deleteMessageForMe(i, messageViewHolder);
-                                } else {
-                                    dialog.cancel();
-                                }
-                            }
-                        });
-
-                        builder.show();
-                    }
-                }
-            });
-        } else {
-            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (messages.getType().equals("text")) {
-                        CharSequence options[] = new CharSequence[]
-                                {
-                                        "Gỡ ở phía bạn",
-                                        "Hủy"
-                                };
-                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
-
-                        builder.setItems(options, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                if (position == 0) {
-                                    deleteMessageForMe(i, messageViewHolder);
-                                } else {
-                                    dialog.cancel();
-                                }
-                            }
-                        });
-
-                        builder.show();
-                    }
-                }
-            });
-
-        }
+//        if (fromUserID.equals(messageSenderId)) {
+//            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (messages.getType().equals("text")) {
+//                        CharSequence options[] = new CharSequence[]
+//                                {
+//                                        "Thu hồi",
+//                                        "Gỡ ở phía bạn",
+//                                        "Hủy"
+//                                };
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+//                        builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
+//
+//                        builder.setItems(options, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int position) {
+//                                if (position == 0) {
+//                                    deleteMessage(i, messageViewHolder);
+//                                } else if (position == 1) {
+//                                    deleteMessageForMe(i, messageViewHolder);
+//                                } else {
+//                                    dialog.cancel();
+//                                }
+//                            }
+//                        });
+//
+//                        builder.show();
+//                    }
+//                }
+//            });
+//        } else {
+//            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (messages.getType().equals("text")) {
+//                        CharSequence options[] = new CharSequence[]
+//                                {
+//                                        "Gỡ ở phía bạn",
+//                                        "Hủy"
+//                                };
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+//
+//                        builder.setItems(options, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int position) {
+//                                if (position == 0) {
+//                                    deleteMessageForMe(i, messageViewHolder);
+//                                } else {
+//                                    dialog.cancel();
+//                                }
+//                            }
+//                        });
+//
+//                        builder.show();
+//                    }
+//                }
+//            });
+//
+//        }
     }
     @Override
     public int getItemCount ()
