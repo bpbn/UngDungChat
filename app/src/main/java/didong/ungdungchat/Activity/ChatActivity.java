@@ -231,6 +231,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view)
             {
                 SendMessage();
+
             }
         });
 
