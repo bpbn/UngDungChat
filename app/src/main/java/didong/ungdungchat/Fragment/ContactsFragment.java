@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ import com.squareup.picasso.Picasso;
 import java.time.temporal.Temporal;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import didong.ungdungchat.Activity.ChatActivity;
 import didong.ungdungchat.Activity.FindFriendsActivity;
 import didong.ungdungchat.Activity.ProfileActivity;
 import didong.ungdungchat.Model.Contacts;
@@ -214,6 +216,7 @@ public class ContactsFragment extends Fragment {
         });
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -225,6 +228,8 @@ public class ContactsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull ContactsViewHolder holder, int position, @NonNull Contacts model) {
                 String userIDs = getRef(position).getKey();
+                holder.chatIButton.setVisibility(View.VISIBLE);
+                holder.chatIButton.setImageResource(R.drawable.baseline_chat_24);
                 usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -239,9 +244,12 @@ public class ContactsFragment extends Fragment {
                                 } else if (state.equals("offline")) {
                                     holder.onlineIcon.setVisibility(View.INVISIBLE);
                                 }
+
+
                             } else {
                                 holder.onlineIcon.setVisibility(View.INVISIBLE);
                             }
+
 
 
                             if (snapshot.hasChild("image")) {
@@ -259,6 +267,22 @@ public class ContactsFragment extends Fragment {
                                 holder.userName.setText(profileName);
                                 holder.userStatus.setText(profileStatus);
                             }
+
+                            holder.chatIButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    String visit_user_name = snapshot.child("name").getValue().toString();
+                                    String visit_user_image = snapshot.child("image").getValue().toString();
+
+                                    Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                    chatIntent.putExtra("visit_user_id", userIDs);
+                                    chatIntent.putExtra("visit_user_name", visit_user_name);
+                                    chatIntent.putExtra("visit_image", visit_user_image);
+
+                                    startActivity(chatIntent);
+                                }
+                            });
                         }
                     }
 
@@ -267,6 +291,8 @@ public class ContactsFragment extends Fragment {
 
                     }
                 });
+
+
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -297,12 +323,15 @@ public class ContactsFragment extends Fragment {
         TextView userName, userStatus;
         ImageView onlineIcon;
 
+        ImageButton chatIButton;
+
         public ContactsViewHolder(UsersDisplayLayoutBinding itemView) {
             super(itemView.getRoot());
             profileImage = itemView.usersProfileImage;
             userName = itemView.userProfileName;
             userStatus = itemView.userStatus;
             onlineIcon = itemView.userOnlineStatus;
+            chatIButton = itemView.requestsAcceptBtn;
         }
     }
 }
