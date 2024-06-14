@@ -54,7 +54,7 @@
             android:id="@+id/tvMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="type message here..."
+            android:hint="Nhập tin nhắn..."
             android:padding="15dp"
             android:maxLines="5"
             android:layout_toEndOf="@+id/btnSendFile"

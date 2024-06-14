@@ -94,6 +94,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             rootRef.child("Messages")
                     .child(messages.getFrom())
                     .child(messages.getTo())
+                    .child("chats")
                     .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -143,22 +144,65 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 }
             }
         } else if (fromMessageType.equals("image")) {
+            rootRef.child("Messages")
+                    .child(messages.getFrom())
+                    .child(messages.getTo())
+                    .child("chats")
+                    .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists() && snapshot.hasChild("revoke")) {
+                                String revoke = snapshot.child("revoke").getValue().toString();
+
+                                if (revoke.equals(messageSenderId) && revoke.equals(fromUserID)) {
+                                    messageViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
+                                    messageViewHolder.messageSenderPicture.setVisibility(View.GONE);
+                                } else if (revoke.equals(messageSenderId) && !revoke.equals(fromUserID)) {
+                                    messageViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
+                                    messageViewHolder.messageReceiverPicture.setVisibility(View.GONE);
+                                    messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
             if (fromUserID.equals(messageSenderId)) {
-                messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
-                messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+                if (message.equals("Thu hồi")) {
+                    messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
+                    messageViewHolder.senderMessageText.setPadding(20, 20, 20, 20);
 
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
-                messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
-                messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                    messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
+                    messageViewHolder.senderMessageText.setTextColor(Color.GRAY);
+                    messageViewHolder.senderMessageText.setText("Bạn đã thu hồi một tin nhắn");
+                } else {
+                    messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
+                    messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
 
+                    Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+                    messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+                    messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                }
             } else {
-                messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
-                messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                if (message.equals("Thu hồi")) {
+                    messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
+                    messageViewHolder.receiverMessageText.setPadding(20, 20, 20, 20);
 
-                Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
-                messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
-                messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                    messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                    messageViewHolder.receiverMessageText.setTextColor(Color.GRAY);
+                    messageViewHolder.receiverMessageText.setText("Tin nhắn đã bị thu hồi");
+                } else {
+                    messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
+                    messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                    Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+                    messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                    messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                }
                 messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -244,66 +288,64 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         }
 
-//        if (fromUserID.equals(messageSenderId)) {
-//            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (messages.getType().equals("text")) {
-//                        CharSequence options[] = new CharSequence[]
-//                                {
-//                                        "Thu hồi",
-//                                        "Gỡ ở phía bạn",
-//                                        "Hủy"
-//                                };
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
-//                        builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
-//
-//                        builder.setItems(options, new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int position) {
-//                                if (position == 0) {
-//                                    deleteMessage(i, messageViewHolder);
-//                                } else if (position == 1) {
-//                                    deleteMessageForMe(i, messageViewHolder);
-//                                } else {
-//                                    dialog.cancel();
-//                                }
-//                            }
-//                        });
-//
-//                        builder.show();
-//                    }
-//                }
-//            });
-//        } else {
-//            messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (messages.getType().equals("text")) {
-//                        CharSequence options[] = new CharSequence[]
-//                                {
-//                                        "Gỡ ở phía bạn",
-//                                        "Hủy"
-//                                };
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
-//
-//                        builder.setItems(options, new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int position) {
-//                                if (position == 0) {
-//                                    deleteMessageForMe(i, messageViewHolder);
-//                                } else {
-//                                    dialog.cancel();
-//                                }
-//                            }
-//                        });
-//
-//                        builder.show();
-//                    }
-//                }
-//            });
-//
-//        }
+        if (fromUserID.equals(messageSenderId)) {
+
+            messageViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    CharSequence options[] = new CharSequence[]
+                            {
+                                    "Thu hồi",
+                                    "Gỡ ở phía bạn",
+                                    "Hủy"
+                            };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+                    builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
+
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            if (position == 0) {
+                                deleteMessage(i, messageViewHolder);
+                            } else if (position == 1) {
+                                deleteMessageForMe(i, messageViewHolder);
+                            } else {
+                                dialog.cancel();
+                            }
+                        }
+                    });
+
+                    builder.show();
+                    return true;
+                }
+            });
+        } else {
+            messageViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    CharSequence options[] = new CharSequence[]
+                            {
+                                    "Gỡ ở phía bạn",
+                                    "Hủy"
+                            };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(messageViewHolder.itemView.getContext(), R.style.AlertDialog);
+
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            if (position == 0) {
+                                deleteMessageForMe(i, messageViewHolder);
+                            } else {
+                                dialog.cancel();
+                            }
+                        }
+                    });
+
+                    builder.show();
+                    return true;
+                }
+            });
+        }
     }
     @Override
     public int getItemCount ()
@@ -316,6 +358,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getFrom())
                 .child(userMessagesList.get(position).getTo())
+                .child("chats")
                 .child(userMessagesList.get(position).getMessageID())
                 .child("message").setValue("Thu hồi").addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -324,6 +367,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                             rootRef.child("Messages")
                                     .child(userMessagesList.get(position).getTo())
                                     .child(userMessagesList.get(position).getFrom())
+                                    .child("chats")
                                     .child(userMessagesList.get(position).getMessageID())
                                     .child("message").setValue("Thu hồi");
                         }
@@ -337,6 +381,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getFrom())
                 .child(userMessagesList.get(position).getTo())
+                .child("chats")
                 .child(userMessagesList.get(position).getMessageID())
                 .child("revoke").setValue(mAuth.getCurrentUser().getUid()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -345,6 +390,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                             rootRef.child("Messages")
                                     .child(userMessagesList.get(position).getTo())
                                     .child(userMessagesList.get(position).getFrom())
+                                    .child("chats")
                                     .child(userMessagesList.get(position).getMessageID())
                                     .child("revoke").setValue(mAuth.getCurrentUser().getUid());
                         }

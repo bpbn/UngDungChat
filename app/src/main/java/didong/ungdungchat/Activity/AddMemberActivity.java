@@ -50,7 +50,6 @@ public class AddMemberActivity extends AppCompatActivity {
     DatabaseReference ContactsRef, UsersRef, GroupMembersRef;
     FirebaseAuth mAuth;
     String currentUserID, currentGroupID;
-    private List<Contacts> contactsList = new ArrayList<>();
     private List<String> selectedUserIDs = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
