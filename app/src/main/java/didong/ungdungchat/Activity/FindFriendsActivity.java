@@ -32,7 +32,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -46,9 +49,9 @@ public class FindFriendsActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView FindFriendsRecyclerList;
 
-    private DatabaseReference UsersRef, ContactRef, ChatRequestsRef;
+    private DatabaseReference UsersRef, ContactRef, ChatRequestsRef, RootRef;
     private FirebaseAuth mAuth;
-    private String currentUserID;
+    private String currentUserID, cUID;
     private List<String> contactsList= new ArrayList<>();
     private List<String> requestsSentList = new ArrayList<>();
 
@@ -66,8 +69,9 @@ public class FindFriendsActivity extends AppCompatActivity {
         if (currentUser != null) {
             currentUserID = currentUser.getUid();
         }
+        cUID = mAuth.getCurrentUser().getUid();
 
-
+        RootRef = FirebaseDatabase.getInstance().getReference();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ContactRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
         ChatRequestsRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
@@ -92,6 +96,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                 return false;
             }
         });
+        updateUserStatus("online");
     }
 
     private void fetchContactsAndRequestsSent() {
@@ -147,7 +152,7 @@ public class FindFriendsActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Contacts model) {
                         String userIDs = getRef(position).getKey();
 
                         // Kiểm tra nếu userIDs không nằm trong danh sách contactsList và requestsSentList và không phải là user đang đăng nhập
@@ -275,7 +280,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                 };
         binding.findFriendsRecyclerList.setAdapter(adapter);
         adapter.startListening();
-
+        updateUserStatus("online");
     }
 
     public static class FindFriendViewHolder extends RecyclerView.ViewHolder {
@@ -288,5 +293,25 @@ public class FindFriendsActivity extends AppCompatActivity {
             userName = itemView.userProfileName;
 
         }
+    }
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

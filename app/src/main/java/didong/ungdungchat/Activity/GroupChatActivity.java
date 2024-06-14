@@ -55,8 +55,8 @@ public class GroupChatActivity extends AppCompatActivity {
     List<GroupMessages> groupMessagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private FirebaseAuth mAuth;
-    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef;
-    private String currentGroupName,currentGroupID, currentUserID, currentUserName, currentDate, currentTime;
+    private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, RootRef;
+    private String currentGroupName,currentGroupID, currentUserID, currentUserName, currentDate, currentTime, cUID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +75,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
+        cUID = mAuth.getCurrentUser().getUid();
+        RootRef = FirebaseDatabase.getInstance().getReference();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
@@ -153,6 +155,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
             }
         });
+        updateUserStatus("online");
     }
 
     private void InitializeFields() {
@@ -261,5 +264,25 @@ public class GroupChatActivity extends AppCompatActivity {
         Intent intent = new Intent(GroupChatActivity.this, ListMemberActivity.class);
         intent.putExtra("groupID", currentGroupID);
         startActivity(intent);
+    }
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

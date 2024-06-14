@@ -133,14 +133,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(currentUser != null)
-        {
-            updateUserStatus("offline");
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        if(currentUser != null)
+//        {
+//            updateUserStatus("offline");
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -205,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
     private void sendUserToFindFriendsActivity() {
         Intent intent = new Intent(MainActivity.this, FindFriendsActivity.class);
         startActivity(intent);
+        updateUserStatus("online");
 //        finish();
     }
     private void sendUserToSettingActivity() {

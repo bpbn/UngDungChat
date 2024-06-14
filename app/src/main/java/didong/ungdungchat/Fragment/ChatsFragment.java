@@ -130,9 +130,9 @@ public class ChatsFragment extends Fragment {
                                                     e.printStackTrace();
                                                 }
                                             }
-                                            if (state.equals("online")) {
-                                                holder.userStatus.setText("online");
-                                            }
+                                        }
+                                        if (state.equals("online")) {
+                                            holder.userStatus.setText("online");
                                         }
                                     }
                                     else

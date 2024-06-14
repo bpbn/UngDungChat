@@ -67,7 +67,7 @@ public class ChatActivity extends AppCompatActivity {
 
     boolean isKeyboardShowing = false;
 
-    private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID;
+    private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID, cUID, currentUserId, currentUser;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
 
@@ -125,14 +125,57 @@ public class ChatActivity extends AppCompatActivity {
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task1 -> {
                                 binding.tvMessage.setText("");
                             });
+                        }
+                    };
+                });
+            } else if (checker.equals("pdf")) {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("PDF Files");
+                String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
+                String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
+
+                DatabaseReference userMessageKeyRef = RootRef.child("Messages")
+                        .child(messageSenderID).child(messageReceiverID).push();
+
+                String messagePushID = userMessageKeyRef.getKey();
+
+                StorageReference filePath = storageReference.child(messagePushID + "." + "pdf");
+                uploadTask = filePath.putFile(fileUri);
+                uploadTask.continueWithTask(new Continuation() {
+                    @Override
+                    public Object then(@NonNull Task task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw Objects.requireNonNull(task.getException());
+                        }
+                        return filePath.getDownloadUrl();
                     }
-                };
-            });
-        }
-//        else {
-//            Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
-//            startActivity(intent);
-//        }
+                }).addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUrl = (Uri) task.getResult();
+                            String url = downloadUrl.toString();
+
+                            Map messageTextBody = new HashMap();
+                            messageTextBody.put("message", url);
+                            messageTextBody.put("name", fileUri.getLastPathSegment());
+                            messageTextBody.put("type", checker);
+                            messageTextBody.put("from", messageSenderID);
+                            messageTextBody.put("to", messageReceiverID);
+                            messageTextBody.put("messageID", messagePushID);
+                            messageTextBody.put("time", saveCurrentTime);
+                            messageTextBody.put("date", saveCurrentDate);
+
+                            Map messageBodyDetails = new HashMap();
+                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+
+                            RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task1 -> {
+                                binding.tvMessage.setText("");
+                            });
+                        }
+                    };
+                });
+            }
         }
     });
 
@@ -145,6 +188,9 @@ public class ChatActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+        currentUserId = mAuth.getCurrentUser().getUid();
+        cUID = currentUserId;
+        currentUser = mAuth.getCurrentUser().getUid();
         messageSenderID = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
         RootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -318,6 +364,7 @@ public class ChatActivity extends AppCompatActivity {
                         if (which == 1)
                         {
                             checker = "pdf";
+                            mStartForResult.launch("application/pdf");
                         }
                         if (which == 2)
                         {
@@ -335,6 +382,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
+        updateUserStatus("online");
 
         RootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
@@ -418,5 +466,26 @@ public class ChatActivity extends AppCompatActivity {
                 binding.tvMessage.setText("");
             });
         }
+    }
+
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

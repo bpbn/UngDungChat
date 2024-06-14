@@ -21,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import didong.ungdungchat.Model.Contacts;
@@ -29,9 +31,9 @@ import didong.ungdungchat.databinding.ActivityProfileBinding;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private String receiverUserID, senderUserID, Current_State;
+    private String receiverUserID, senderUserID, Current_State, cUID;
     ActivityProfileBinding binding;
-    private DatabaseReference UserRef, ChatRequestRef, ContactsRef, NotificationRef;
+    private DatabaseReference UserRef, ChatRequestRef, ContactsRef, NotificationRef, RootRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -47,6 +49,8 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         mAuth = FirebaseAuth.getInstance();
+        cUID = mAuth.getCurrentUser().getUid();
+        RootRef = FirebaseDatabase.getInstance().getReference();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
         ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
@@ -58,6 +62,9 @@ public class ProfileActivity extends AppCompatActivity {
         Current_State = "new";
 
         RetrieveUserInfo();
+        if (cUID != null) {
+            updateUserStatus("online");
+        }
     }
 
     private void RetrieveUserInfo() {
@@ -303,5 +310,26 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

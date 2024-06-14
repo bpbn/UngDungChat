@@ -31,6 +31,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import didong.ungdungchat.databinding.ActivitySettingBinding;
@@ -38,7 +40,7 @@ import didong.ungdungchat.databinding.ActivitySettingBinding;
 public class SettingActivity extends AppCompatActivity {
 
     ActivitySettingBinding binding;
-    private String currentUserID;
+    private String currentUserID, cUID;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
     private ActivityResultLauncher<Intent> activityResultLauncher;
@@ -97,6 +99,10 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         retrieveUserInfo();
+        if (mAuth.getCurrentUser() != null) {
+            cUID = mAuth.getCurrentUser().getUid();
+            updateUserStatus("online");
+        }
     }
 
     private void updateSettings() {
@@ -225,5 +231,26 @@ public class SettingActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }

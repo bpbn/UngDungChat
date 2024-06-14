@@ -35,6 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -48,9 +51,9 @@ import didong.ungdungchat.databinding.MemberDisplayGroupsBinding;
 public class ListMemberActivity extends AppCompatActivity {
 
     ActivityListMemberBinding binding;
-    DatabaseReference GroupRef, UsersRef, GroupMembersRef;
+    DatabaseReference GroupRef, UsersRef, GroupMembersRef, RootRef;
     FirebaseAuth mAuth;
-    String currentGroupID, itemUserID;
+    String currentGroupID, itemUserID, cUID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +66,9 @@ public class ListMemberActivity extends AppCompatActivity {
 //            return insets;
 //        });
         currentGroupID = getIntent().getExtras().get("groupID").toString();
+        mAuth = FirebaseAuth.getInstance();
+        cUID = mAuth.getCurrentUser().getUid();
+        RootRef = FirebaseDatabase.getInstance().getReference();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupMembersRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupID).child("members");
         binding.listMember.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -136,6 +142,7 @@ public class ListMemberActivity extends AppCompatActivity {
         };
         binding.listMember.setAdapter(adapter);
         adapter.startListening();
+        updateUserStatus("online");
     }
 
     private void requestNickName(String userName, String userID) {
@@ -223,5 +230,25 @@ public class ListMemberActivity extends AppCompatActivity {
             userName = itemView.userProfileName;
             nickname = itemView.userNickName;
         }
+    }
+    private void updateUserStatus(String state)
+    {
+        String saveCurrentTime, saveCurrentDate;
+
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd/MM/yyyy");
+        saveCurrentDate = currentDate.format(calendar.getTime());
+
+        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm");
+        saveCurrentTime = currentTime.format(calendar.getTime());
+
+        HashMap<String, Object> onlineStateMap = new HashMap<>();
+        onlineStateMap.put("time", saveCurrentTime);
+        onlineStateMap.put("date", saveCurrentDate);
+        onlineStateMap.put("state", state);
+        RootRef.child("Users").child(cUID).child("userState")
+                .updateChildren(onlineStateMap);
+
     }
 }
