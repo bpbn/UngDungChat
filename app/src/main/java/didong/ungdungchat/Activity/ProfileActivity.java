@@ -183,13 +183,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            ContactsRef.child(senderUserID).child(receiverUserID)
+                        if (task.isSuccessful()) {
+                            ContactsRef.child(receiverUserID).child(senderUserID)
                                     .removeValue()
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State = "new";
                                                 binding.sendMessageRequestButton.setText("Gửi lời mời");
@@ -203,6 +203,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
     private void AcceptChatRequest() {
         ContactsRef.child(senderUserID).child(receiverUserID)
