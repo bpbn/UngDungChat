@@ -2,6 +2,7 @@
 
 package didong.ungdungchat.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -32,6 +33,8 @@ import com.squareup.picasso.Picasso;
 import java.time.temporal.Temporal;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import didong.ungdungchat.Activity.FindFriendsActivity;
+import didong.ungdungchat.Activity.ProfileActivity;
 import didong.ungdungchat.Model.Contacts;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.FragmentContactsBinding;
@@ -120,8 +123,8 @@ public class ContactsFragment extends Fragment {
                 return false;
             }
         });
-        
-        
+
+
         return view;
     }
 
@@ -225,31 +228,23 @@ public class ContactsFragment extends Fragment {
                 usersRef.child(userIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists())
-                        {
-                            if (snapshot.child("userState").hasChild("state"))
-                            {
+                        if (snapshot.exists()) {
+                            if (snapshot.child("userState").hasChild("state")) {
                                 String state = snapshot.child("userState").child("state").getValue().toString();
                                 String date = snapshot.child("userState").child("date").getValue().toString();
                                 String time = snapshot.child("userState").child("time").getValue().toString();
 
-                                if (state.equals("online"))
-                                {
+                                if (state.equals("online")) {
                                     holder.onlineIcon.setVisibility(View.VISIBLE);
-                                }
-                                else if (state.equals("offline"))
-                                {
+                                } else if (state.equals("offline")) {
                                     holder.onlineIcon.setVisibility(View.INVISIBLE);
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 holder.onlineIcon.setVisibility(View.INVISIBLE);
                             }
 
 
-                            if (snapshot.hasChild("image"))
-                            {
+                            if (snapshot.hasChild("image")) {
                                 String userImage = snapshot.child("image").getValue().toString();
                                 String profileName = snapshot.child("name").getValue().toString();
                                 String profileStatus = snapshot.child("status").getValue().toString();
@@ -257,9 +252,7 @@ public class ContactsFragment extends Fragment {
                                 holder.userName.setText(profileName);
                                 holder.userStatus.setText(profileStatus);
                                 Picasso.get().load(userImage).placeholder(R.drawable.baseline_account_circle_24).into(holder.profileImage);
-                            }
-                            else
-                            {
+                            } else {
                                 String profileName = snapshot.child("name").getValue().toString();
                                 String profileStatus = snapshot.child("status").getValue().toString();
 
@@ -272,6 +265,16 @@ public class ContactsFragment extends Fragment {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String visit_user_id = getRef(position).getKey();
+                        Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                        profileIntent.putExtra("visit_user_id", visit_user_id);
+                        startActivity(profileIntent);
                     }
                 });
             }
@@ -288,11 +291,12 @@ public class ContactsFragment extends Fragment {
         binding.contactsList.setAdapter(adapter);
         adapter.startListening();
     }
-    public static class ContactsViewHolder extends RecyclerView.ViewHolder
-    {
+
+    public static class ContactsViewHolder extends RecyclerView.ViewHolder {
         CircleImageView profileImage;
         TextView userName, userStatus;
         ImageView onlineIcon;
+
         public ContactsViewHolder(UsersDisplayLayoutBinding itemView) {
             super(itemView.getRoot());
             profileImage = itemView.usersProfileImage;
