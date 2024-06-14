@@ -48,7 +48,10 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/baseline_lock_24"
             android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:drawableEnd="@drawable/baseline_vpn_key_24"
+            >
+        </com.google.android.material.textfield.TextInputEditText>
 
     </com.google.android.material.textfield.TextInputLayout>
 

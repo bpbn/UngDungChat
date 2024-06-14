@@ -6,13 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="15dp"
     tools:context=".Activity.SettingActivity">
-    <include
-        layout="@layout/app_bar_layout"
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/setting_toolbar"
-        >
-    </include>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:popupTheme="@style/ThemeOverlay.PopupTheme"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
@@ -35,6 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
+            android:layout_margin="15dp"
             android:drawableStart="@drawable/baseline_account_box_24"
             android:hint="@string/username"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -48,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
+            android:layout_margin="15dp"
             android:drawableStart="@drawable/baseline_edit_document_24"
             android:hint="@string/status_profile"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -58,8 +62,17 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
+        android:layout_margin="15dp"
         android:textSize="20sp"
         android:text="@string/update"
         />
-
+    <Button
+        android:id="@+id/btn_chang_password"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_margin="15dp"
+        android:textSize="20sp"
+        android:text="THAY ĐỔI MẬT KHẨU"
+        />
 </LinearLayout>
