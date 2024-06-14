@@ -154,13 +154,12 @@ public class SettingActivity extends AppCompatActivity {
 
 
     }
-    private boolean isPasswordVisible = false;
 
     private void changePassword() {
         dialog.setContentView(R.layout.layout_change_password);
         dialog.setTitle("Đổi mật khẩu");
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show(); // Hiển thị Dialog
+        dialog.show();
 
         // Gắn changePasswordBinding với layout_change_password
         changePasswordBinding = LayoutChangePasswordBinding.bind(dialog.findViewById(R.id.change_layout_password));
@@ -203,6 +202,7 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
     }
+    // hiển thị password
     private void showPassword(TextInputEditText editText, MotionEvent event) {
         final int DRAWABLE_RIGHT = 2;
 
@@ -216,12 +216,12 @@ public class SettingActivity extends AppCompatActivity {
                     editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_lock_24, 0, R.drawable.baseline_vpn_key_off_24, 0);
                 }
-                editText.setSelection(editText.getText().length()); // Di chuyển con trỏ tới cuối
+                editText.setSelection(editText.getText().length());
             }
         }
     }
 
-
+// Cập nhật password
     private void updatePassword(String oldpass, String newpass) {
         loadingBar.show();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -254,7 +254,7 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
     }
-
+// Cập nhật thông tin account
     private void updateSettings() {
         String name = binding.username.getText().toString();
         String status = binding.profileStatus.getText().toString();
@@ -307,7 +307,7 @@ public class SettingActivity extends AppCompatActivity {
             saveUserInfo(name, status, currentProfileImageUrl);
         }
     }
-
+// lưu vào firebase
     private void saveUserInfo(String name, String status, String imageUrl) {
         HashMap<String, Object> profileMap = new HashMap<>();
         profileMap.put("uid", currentUserID);
@@ -342,7 +342,7 @@ public class SettingActivity extends AppCompatActivity {
                     }
                 });
     }
-
+// Hiển thị thông tin hồ sơ
     private void retrieveUserInfo() {
         RootRef.child("Users").child(currentUserID)
                 .addValueEventListener(new ValueEventListener() {
@@ -371,7 +371,7 @@ public class SettingActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(SettingActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingActivity.this, "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

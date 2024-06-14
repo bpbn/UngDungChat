@@ -50,7 +50,7 @@ public class GroupsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         IntializeFields();
-        RetrieveAndDisplayGroup();
+        retrieveAndDisplayGroup();
 
         binding.listGroups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -58,10 +58,12 @@ public class GroupsFragment extends Fragment {
                 Groups groups = (Groups) parent.getItemAtPosition(position);
                 String currentGroupName = groups.getName();
                 String currentGroupID = groups.getGroupID();
+                String currentGroupImage = groups.getImage();
 
                 Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
                 groupChatIntent.putExtra("groupName", currentGroupName);
                 groupChatIntent.putExtra("groupID", currentGroupID);
+                groupChatIntent.putExtra("groupImage", currentGroupImage);
                 startActivity(groupChatIntent);
             }
         });
@@ -71,8 +73,9 @@ public class GroupsFragment extends Fragment {
     private void IntializeFields() {
         groupsAdapter = new GroupsAdapter(getContext(), R.layout.groups_display_layout, listGroup);
         binding.listGroups.setAdapter(groupsAdapter);
+        binding.listGroups.setDivider(null);
     }
-    private void RetrieveAndDisplayGroup() {
+    private void retrieveAndDisplayGroup() {
         currentUserID = mAuth.getCurrentUser().getUid();
         GroupRef.addValueEventListener(new ValueEventListener() {
             @Override

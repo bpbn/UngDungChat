@@ -1,10 +1,12 @@
 package didong.ungdungchat.Activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.graphics.Insets;
@@ -45,18 +48,21 @@ import didong.ungdungchat.Model.GroupMessages;
 import didong.ungdungchat.Model.Messages;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityGroupChatBinding;
+import didong.ungdungchat.databinding.CustomChatBarBinding;
+import didong.ungdungchat.databinding.CustomGroupChatBarBinding;
 import didong.ungdungchat.databinding.FragmentGroupsBinding;
 
 public class GroupChatActivity extends AppCompatActivity {
 
     ActivityGroupChatBinding binding;
+    CustomGroupChatBarBinding groupChatBarBinding;
     boolean isKeyboardShowing = false;
     private GroupMessagesAdapter groupMessagesAdapter;
     List<GroupMessages> groupMessagesList = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef, GroupNameRef, GroupMessageKeyRef, RootRef;
-    private String currentGroupName,currentGroupID, currentUserID, currentUserName, currentDate, currentTime, cUID;
+    private String currentGroupName,currentGroupID, currentGroupImage, currentUserID, currentUserName, currentDate, currentTime, cUID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +77,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
+        currentGroupImage = getIntent().getExtras().get("groupImage").toString();
         Toast.makeText(GroupChatActivity.this, currentGroupName,Toast.LENGTH_SHORT).show();
 
         mAuth = FirebaseAuth.getInstance();
@@ -82,6 +89,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
         InitializeFields();
         getUserInfo();
+        groupChatBarBinding.customGroupName.setText(currentGroupName);
+        Picasso.get().load(currentGroupImage).placeholder(R.drawable.baseline_groups_24).into(groupChatBarBinding.customGroupImage);
 
         binding.sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +169,13 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void InitializeFields() {
         setSupportActionBar(binding.groupChatBarLayout);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(currentGroupName);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View action_bar_view = layoutInflater.inflate(R.layout.custom_group_chat_bar, null);
+        actionBar.setCustomView(action_bar_view);
+        groupChatBarBinding = CustomGroupChatBarBinding.bind(action_bar_view);
 
         groupMessagesAdapter = new GroupMessagesAdapter(groupMessagesList, currentGroupID);
         linearLayoutManager = new LinearLayoutManager(this);
@@ -233,10 +248,10 @@ public class GroupChatActivity extends AppCompatActivity {
         {
             showListMember();
         }
-//        if(item.getItemId() == R.id.miCaiDat)
-//        {
-//
-//        }
+        if(item.getItemId() == R.id.miCaiDat)
+        {
+            settingGroup();
+        }
         if(item.getItemId() == R.id.miLogOut)
         {
             removeUserFromGroup();
@@ -263,6 +278,13 @@ public class GroupChatActivity extends AppCompatActivity {
     }
     private void showListMember() {
         Intent intent = new Intent(GroupChatActivity.this, ListMemberActivity.class);
+        intent.putExtra("groupID", currentGroupID);
+        startActivity(intent);
+    }
+
+    private void settingGroup() {
+        Intent intent = new Intent(GroupChatActivity.this, SettingGroupActivity.class);
+        intent.putExtra("groupName", currentGroupName);
         intent.putExtra("groupID", currentGroupID);
         startActivity(intent);
     }
