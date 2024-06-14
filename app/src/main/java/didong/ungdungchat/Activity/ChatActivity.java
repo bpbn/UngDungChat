@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -40,11 +42,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.type.DateTime;
 import com.squareup.picasso.Picasso;
+
+import org.apache.commons.logging.LogFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +69,7 @@ import didong.ungdungchat.databinding.ActivityChatBinding;
 import didong.ungdungchat.databinding.CustomChatBarBinding;
 
 public class ChatActivity extends AppCompatActivity {
+    private static final org.apache.commons.logging.Log log = LogFactory.getLog(ChatActivity.class);
     ActivityChatBinding binding;
     CustomChatBarBinding customChatBarBinding;
 
@@ -87,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
                 String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
 
                 DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                        .child(messageSenderID).child(messageReceiverID).push();
+                        .child(messageSenderID).child(messageReceiverID).child("chats").push();
 
                 String messagePushID = userMessageKeyRef.getKey();
 
@@ -110,7 +118,7 @@ public class ChatActivity extends AppCompatActivity {
 
                             Map messageTextBody = new HashMap();
                             messageTextBody.put("message", url);
-                            messageTextBody.put("name", fileUri.getLastPathSegment());
+                            messageTextBody.put("name", fileUri.getLastPathSegment() + ".jpg");
                             messageTextBody.put("type", checker);
                             messageTextBody.put("from", messageSenderID);
                             messageTextBody.put("to", messageReceiverID);
@@ -119,26 +127,29 @@ public class ChatActivity extends AppCompatActivity {
                             messageTextBody.put("date", saveCurrentDate);
 
                             Map messageBodyDetails = new HashMap();
-                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put(messageSenderRef + "/chats/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put( messageReceiverRef + "/chats/" + messagePushID, messageTextBody);
 
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task1 -> {
                                 binding.tvMessage.setText("");
                             });
+                            Long tsLong = System.currentTimeMillis()/1000;
+                            RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("timeStamp").setValue(-tsLong);
+                            RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("timeStamp").setValue(-tsLong);
                         }
                     };
                 });
-            } else if (checker.equals("pdf")) {
-                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("PDF Files");
+            } else {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Document Files");
                 String messageSenderRef = "Messages/" + messageSenderID + "/" + messageReceiverID;
                 String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
 
                 DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                        .child(messageSenderID).child(messageReceiverID).push();
+                        .child(messageSenderID).child(messageReceiverID).child("chats").push();
 
                 String messagePushID = userMessageKeyRef.getKey();
 
-                StorageReference filePath = storageReference.child(messagePushID + "." + "pdf");
+                StorageReference filePath = storageReference.child(messagePushID);
                 uploadTask = filePath.putFile(fileUri);
                 uploadTask.continueWithTask(new Continuation() {
                     @Override
@@ -166,14 +177,22 @@ public class ChatActivity extends AppCompatActivity {
                             messageTextBody.put("date", saveCurrentDate);
 
                             Map messageBodyDetails = new HashMap();
-                            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-                            messageBodyDetails.put(messageReceiverRef + "/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put(messageSenderRef + "/chats/" + messagePushID, messageTextBody);
+                            messageBodyDetails.put( messageReceiverRef + "/chats/" + messagePushID, messageTextBody);
 
                             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task1 -> {
                                 binding.tvMessage.setText("");
                             });
+                            Long tsLong = System.currentTimeMillis()/1000;
+                            RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("timeStamp").setValue(-tsLong);
+                            RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("timeStamp").setValue(-tsLong);
                         }
                     };
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
                 });
             }
         }
@@ -298,7 +317,7 @@ public class ChatActivity extends AppCompatActivity {
                             String currentDate = now.format(Calendar.getInstance().getTime());
                             if (state.equals("offline")) {
                                 if (currentDate.equals(date)) {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
                                     try {
                                         long time1 = Objects.requireNonNull(sdf.parse(time)).getTime();
                                         long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
@@ -349,7 +368,7 @@ public class ChatActivity extends AppCompatActivity {
                         {
                                 "Images",
                                 "PDF Files",
-                                "Ms Word Files"
+                                "Files"
                         };
                 AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
                 builder.setTitle("Select the File");
@@ -368,7 +387,8 @@ public class ChatActivity extends AppCompatActivity {
                         }
                         if (which == 2)
                         {
-                            checker = "docx";
+                            checker = "file";
+                            mStartForResult.launch("*/*");
                         }
                     }
                 });
@@ -384,7 +404,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onStart();
         updateUserStatus("online");
 
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("chats")
                 .addChildEventListener(new ChildEventListener() {
                     @SuppressLint("NotifyDataSetChanged")
                     @Override
@@ -423,8 +443,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-    private void SendMessage()
-    {
+    private void SendMessage() {
         String messageText = binding.tvMessage.getText().toString().trim();
 
         if (TextUtils.isEmpty(messageText))
@@ -437,7 +456,7 @@ public class ChatActivity extends AppCompatActivity {
             String messageReceiverRef = "Messages/" + messageReceiverID + "/" + messageSenderID;
 
             DatabaseReference userMessageKeyRef = RootRef.child("Messages")
-                    .child(messageSenderID).child(messageReceiverID).push();
+                    .child(messageSenderID).child(messageReceiverID).child("chats").push();
 
             String messagePushID = userMessageKeyRef.getKey();
 
@@ -451,8 +470,8 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("date", saveCurrentDate);
 
             Map messageBodyDetails = new HashMap();
-            messageBodyDetails.put(messageSenderRef + "/" + messagePushID, messageTextBody);
-            messageBodyDetails.put( messageReceiverRef + "/" + messagePushID, messageTextBody);
+            messageBodyDetails.put(messageSenderRef + "/chats/" + messagePushID, messageTextBody);
+            messageBodyDetails.put( messageReceiverRef + "/chats/" + messagePushID, messageTextBody);
 
             RootRef.updateChildren(messageBodyDetails).addOnCompleteListener(task -> {
                 if (task.isSuccessful())
@@ -465,6 +484,9 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 binding.tvMessage.setText("");
             });
+            Long tsLong = System.currentTimeMillis()/1000;
+            RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("timeStamp").setValue(-tsLong);
+            RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("timeStamp").setValue(-tsLong);
         }
     }
 

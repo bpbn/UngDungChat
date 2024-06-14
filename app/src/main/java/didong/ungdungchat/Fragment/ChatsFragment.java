@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.core.OrderBy;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -48,7 +51,7 @@ public class ChatsFragment extends Fragment {
         binding = FragmentChatsBinding.bind(view);
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
-        chatsRef = FirebaseDatabase.getInstance().getReference().child("Contacts").child(currentUserID);
+        chatsRef = FirebaseDatabase.getInstance().getReference().child("Messages").child(currentUserID);
         usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         binding.chatsList.setLayoutManager(new LinearLayoutManager(getContext()));
         return view;
@@ -58,15 +61,15 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(chatsRef, Contacts.class)
+                .setQuery(chatsRef.orderByChild("timeStamp"), Contacts.class)
                 .build();
         FirebaseRecyclerAdapter<Contacts, ChatsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, ChatsViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final ChatsViewHolder holder, int position, @NonNull Contacts model)
                     {
-                        final String usersIDs = getRef(position).getKey();
                         final String[] retImage = {"default_image"};
+                        final String usersIDs = getRef(position).getKey();
 
                         usersRef.child(usersIDs).addValueEventListener(new ValueEventListener() {
                             @Override
@@ -101,7 +104,7 @@ public class ChatsFragment extends Fragment {
                                             SimpleDateFormat now = new SimpleDateFormat("dd/MM/yyyy");
                                             String currentDate = now.format(Calendar.getInstance().getTime());
                                             if (currentDate.equals(date)) {
-                                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
                                                 try {
                                                     long time1 = Objects.requireNonNull(sdf.parse(time)).getTime();
                                                     long time2 = Objects.requireNonNull(sdf.parse(sdf.format(Calendar.getInstance().getTime()))).getTime();
