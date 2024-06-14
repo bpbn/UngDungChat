@@ -34,20 +34,21 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+import didong.ungdungchat.Fragment.GroupsFragment;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.ActivityGroupChatBinding;
 import didong.ungdungchat.databinding.ActivitySettingGroupBinding;
 
 public class SettingGroupActivity extends AppCompatActivity {
-
     ActivitySettingGroupBinding binding;
     private FirebaseAuth mAuth;
     private DatabaseReference rootRef;
     String currentGroupID, currentGroupName;
     private ActivityResultLauncher<Intent> activityResultLauncher;
-    private Uri selectedImageUri;
-    private StorageReference userProfileImageRef;
-    private String currentProfileImageUrl;
+    private Uri selectedImageUri, selectedBackgroundUri;
+    private StorageReference userProfileImageRef, groupBackgroundImagesRef;
+    private String currentProfileImageUrl, currentBackgroundImageUrl;
+    private boolean isChangingBackground = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +60,7 @@ public class SettingGroupActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         rootRef = FirebaseDatabase.getInstance().getReference();
         userProfileImageRef = FirebaseStorage.getInstance().getReference().child("Group_Images");
+        groupBackgroundImagesRef = FirebaseStorage.getInstance().getReference().child("Group_Background_Images");
 
         currentGroupName = getIntent().getExtras().get("groupName").toString();
         currentGroupID = getIntent().getExtras().get("groupID").toString();
@@ -71,8 +73,13 @@ public class SettingGroupActivity extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Intent data = result.getData();
                             if (data != null && data.getData() != null) {
-                                selectedImageUri = data.getData();
-                                binding.groupImage.setImageURI(selectedImageUri);
+                                if (isChangingBackground) {
+                                    selectedBackgroundUri = data.getData();
+                                    binding.backgroundImage.setImageURI(selectedBackgroundUri);
+                                } else {
+                                    selectedImageUri = data.getData();
+                                    binding.groupImage.setImageURI(selectedImageUri);
+                                }
                             }
                         }
                     }
@@ -87,6 +94,17 @@ public class SettingGroupActivity extends AppCompatActivity {
         binding.groupImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                activityResultLauncher.launch(intent);
+            }
+        });
+
+        binding.btnChangeBackground.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isChangingBackground = true;
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
@@ -113,7 +131,29 @@ public class SettingGroupActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Uri> task) {
                                 if (task.isSuccessful()) {
                                     String downloadUrl = task.getResult().toString();
-                                    saveUserInfo(name, downloadUrl);
+                                    saveInfo(name, downloadUrl, currentBackgroundImageUrl);
+                                } else {
+                                    Toast.makeText(SettingGroupActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(SettingGroupActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }else if (selectedBackgroundUri != null) {
+            StorageReference filePath = groupBackgroundImagesRef.child(currentGroupID + "_background.jpg");
+            filePath.putFile(selectedBackgroundUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        filePath.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    String downloadUrl = task.getResult().toString();
+                                    saveInfo(name, currentProfileImageUrl, downloadUrl);
                                 } else {
                                     Toast.makeText(SettingGroupActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
                                 }
@@ -125,15 +165,19 @@ public class SettingGroupActivity extends AppCompatActivity {
                 }
             });
         } else {
-            saveUserInfo(name, currentProfileImageUrl);
+            saveInfo(name, currentProfileImageUrl, currentBackgroundImageUrl);
         }
     }
 
-    private void saveUserInfo(String name, String imageUrl) {
+    private void saveInfo(String name, String imageUrl, String backgroundUrl) {
         HashMap<String, Object> profileMap = new HashMap<>();
         profileMap.put("name", name);
         if (imageUrl != null) {
             profileMap.put("image", imageUrl);
+        }
+
+        if (backgroundUrl != null) {
+            profileMap.put("backgroundImage", backgroundUrl);
         }
 
         rootRef.child("Groups").child(currentGroupID).updateChildren(profileMap)
@@ -158,6 +202,7 @@ public class SettingGroupActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             String userName = snapshot.child("name").getValue(String.class);
                             currentProfileImageUrl = snapshot.child("image").getValue(String.class);
+                            currentBackgroundImageUrl = snapshot.child("backgroundImage").getValue(String.class);
 
                             if (userName != null) {
                                 binding.groupname.setText(userName);
@@ -177,6 +222,4 @@ public class SettingGroupActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 }

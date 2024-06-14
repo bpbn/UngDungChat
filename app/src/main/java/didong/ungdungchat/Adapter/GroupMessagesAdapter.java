@@ -4,11 +4,13 @@ import static android.content.Intent.getIntent;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -93,6 +95,22 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
         groupMessagesViewHolder.messageReceiverPicture.setVisibility(View.GONE);
 
         if(fromMessageType != null){
+            groupRef.child("members").child(fromUserID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists() && snapshot.hasChild("nickname")) {
+                        String nickname = snapshot.child("nickname").getValue().toString();
+                        groupMessagesViewHolder.txtReceiverName.setText(nickname);
+                    } else {
+                        groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    // Handle possible errors.
+                }
+            });
             if (fromMessageType.equals("text"))
             {
                 groupRef.child("messages").child(groupMessages.getMessageID()).addValueEventListener(new ValueEventListener() {
@@ -104,6 +122,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                             if(revoke.equals(messageSenderId) && revoke.equals(fromUserID)){
                                 groupMessagesViewHolder.txtSenderMess.setVisibility(View.GONE);
                             } else if(revoke.equals(messageSenderId) && !revoke.equals(fromUserID)){
+                                groupMessagesViewHolder.txtReceiverName.setVisibility(View.GONE);
                                 groupMessagesViewHolder.txtReceiverName.setVisibility(View.GONE);
                                 groupMessagesViewHolder.txtReceiverMess.setVisibility(View.GONE);
                                 groupMessagesViewHolder.imgReceiver.setVisibility(View.GONE);
@@ -142,23 +161,84 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                         groupMessagesViewHolder.txtReceiverMess.setTextColor(Color.BLACK);
                         groupMessagesViewHolder.txtReceiverMess.setText(groupMessages.getMessage() + "\n \n" + groupMessages.getTime() + " - " + groupMessages.getDate());
                     }
-                    groupRef.child("members").child(fromUserID).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists() && snapshot.hasChild("nickname")) {
-                                String nickname = snapshot.child("nickname").getValue().toString();
-                                groupMessagesViewHolder.txtReceiverName.setText(nickname);
-                            } else {
-                                groupMessagesViewHolder.txtReceiverName.setText(groupMessages.getName());
+                }
+            } else if (fromMessageType.equals("image")) {
+                groupRef.child("messages").child(groupMessages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists() && snapshot.hasChild("revoke")) {
+                            String revoke = snapshot.child("revoke").getValue().toString();
+
+                            if(revoke.equals(messageSenderId) && revoke.equals(fromUserID)){
+                                groupMessagesViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
+                                groupMessagesViewHolder.messageSenderPicture.setVisibility(View.GONE);
+                            } else if(revoke.equals(messageSenderId) && !revoke.equals(fromUserID)){
+                                groupMessagesViewHolder.imgReceiver.setVisibility(View.GONE);
+                                groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
+                                groupMessagesViewHolder.messageReceiverPicture.setVisibility(View.GONE);
                             }
                         }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                if (fromUserID.equals(messageSenderId)) {
+                    if(message.equals("Thu hồi")){
+                        groupMessagesViewHolder.txtSenderMess.setVisibility(View.VISIBLE);
+                        groupMessagesViewHolder.txtSenderMess.setBackgroundResource(R.drawable.sender_messages_layout);
+
+                        groupMessagesViewHolder.txtSenderMess.setTextColor(Color.GRAY);
+                        groupMessagesViewHolder.txtSenderMess.setText("Bạn đã thu hồi một tin nhắn");
+                    }else {
+                        groupMessagesViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
+                        groupMessagesViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                        Picasso.get().load(groupMessages.getMessage()).into(groupMessagesViewHolder.messageSenderPicture);
+                        groupMessagesViewHolder.txtSenderMessageTime.setVisibility(View.VISIBLE);
+                        groupMessagesViewHolder.txtSenderMessageTime.setText(groupMessages.getTime() + " - " + groupMessages.getDate());
+                    }
+                } else {
+                    groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
+                    groupMessagesViewHolder.txtReceiverName.setVisibility(View.VISIBLE);
+                    groupMessagesViewHolder.imgReceiver.setVisibility(View.VISIBLE);
+
+                    if(message.equals("Thu hồi")){
+                        groupMessagesViewHolder.txtReceiverMess.setVisibility(View.VISIBLE);
+                        groupMessagesViewHolder.txtReceiverMess.setBackgroundResource(R.drawable.receiver_messages_layout);
+
+                        groupMessagesViewHolder.txtReceiverMess.setTextColor(Color.GRAY);
+                        groupMessagesViewHolder.txtReceiverMess.setText("Tin nhắn đã bị thu hồi");
+                    }else {
+                        groupMessagesViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                        Picasso.get().load(groupMessages.getMessage()).into(groupMessagesViewHolder.messageReceiverPicture);
+                        groupMessagesViewHolder.txtReceiverMessageTime.setVisibility(View.VISIBLE);
+                        groupMessagesViewHolder.txtReceiverMessageTime.setText(groupMessages.getTime() + " - " + groupMessages.getDate());
+                    }
+                    groupMessagesViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            // Handle possible errors.
+                        public void onClick(View v) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(groupMessagesViewHolder.itemView.getContext(), R.style.AlertDialog);
+                            builder.setTitle("Bạn muốn xem ảnh này?");
+                            builder.setPositiveButton("Xem ảnh", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(groupMessagesList.get(i).getMessage()));
+                                    groupMessagesViewHolder.itemView.getContext().startActivity(intent);
+                                }
+                            });
+                            builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
                         }
                     });
-                }
             }
         }
 
@@ -166,31 +246,28 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
             groupMessagesViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if(groupMessages.getType().equals("text")){
-                        CharSequence options [] = new CharSequence[]
-                                {
-                                        "Thu hồi",
-                                        "Gỡ ở phía bạn",
-                                        "Hủy"
-                                };
-                        AlertDialog.Builder builder = new AlertDialog.Builder(groupMessagesViewHolder.itemView.getContext(), R.style.AlertDialog);
-                        builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
+                    CharSequence options [] = new CharSequence[]
+                            {
+                                    "Thu hồi",
+                                    "Gỡ ở phía bạn",
+                                    "Hủy"
+                            };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(groupMessagesViewHolder.itemView.getContext(), R.style.AlertDialog);
+                    builder.setTitle("Bạn muốn gỡ tin nhắn này ở phía ai?");
 
-                        builder.setItems(options, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                if(position == 0){
-                                    deleteMessage(i, groupMessagesViewHolder);
-                                } else if (position == 1) {
-                                    deleteMessageForMe(i, groupMessagesViewHolder);
-                                }else {
-                                    dialog.cancel();
-                                }
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            if(position == 0){
+                                deleteMessage(i, groupMessagesViewHolder);
+                            } else if (position == 1) {
+                                deleteMessageForMe(i, groupMessagesViewHolder);
+                            }else {
+                                dialog.cancel();
                             }
-                        });
-
-                        builder.show();
-                    }
+                        }
+                    });
+                    builder.show();
                     return true;
                 }
             });
@@ -198,31 +275,29 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
             groupMessagesViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if(groupMessages.getType().equals("text")){
-                        CharSequence options [] = new CharSequence[]
-                                {
-                                        "Gỡ ở phía bạn",
-                                        "Hủy"
-                                };
-                        AlertDialog.Builder builder = new AlertDialog.Builder(groupMessagesViewHolder.itemView.getContext(), R.style.AlertDialog);
+                    CharSequence options [] = new CharSequence[]
+                            {
+                                    "Gỡ ở phía bạn",
+                                    "Hủy"
+                            };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(groupMessagesViewHolder.itemView.getContext(), R.style.AlertDialog);
 
-                        builder.setItems(options, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int position) {
-                                if(position == 0){
-                                    deleteMessageForMe(i, groupMessagesViewHolder);
-                                } else {
-                                    dialog.cancel();
-                                }
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int position) {
+                            if(position == 0){
+                                deleteMessageForMe(i, groupMessagesViewHolder);
+                            } else {
+                                dialog.cancel();
                             }
-                        });
-
-                        builder.show();
-                    }
+                        }
+                    });
+                    builder.show();
                     return true;
                 }
             });
         }
+    }
     }
 
     @Override
@@ -253,10 +328,10 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
         });
     }
     public class GroupMessagesViewHolder extends RecyclerView.ViewHolder{
-        public TextView txtSenderMess, txtReceiverMess, txtReceiverName;
+        public TextView txtSenderMess, txtReceiverMess, txtReceiverName, txtSenderMessageTime, txtReceiverMessageTime;
         public CircleImageView imgReceiver;
         public ImageView messageSenderPicture, messageReceiverPicture;
-
+        public LinearLayout senderMessageImageLayout, receiverMessageImageLayout;
 
         public GroupMessagesViewHolder(@NonNull CustomMessagesGroupsLayoutBinding itemView) {
             super(itemView.getRoot());
@@ -264,8 +339,12 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
             txtSenderMess = itemView.senderMesssageGroupsText;
             txtReceiverMess = itemView.receiverMessageGroupsText;
             imgReceiver = itemView.messageGroupsProfileImage;
-            messageReceiverPicture = itemView.messageGroupsReceiverImageView;
-            messageSenderPicture = itemView.messageGroupsSenderImageView;
+            txtSenderMessageTime = itemView.senderMessageGroupTime;
+            txtReceiverMessageTime = itemView.receiverMessageGroupTime;
+            senderMessageImageLayout = itemView.senderMessageGroupImageLayout;
+            receiverMessageImageLayout = itemView.receiverMessageGroupsImageLayout;
+            messageSenderPicture = itemView.messageGroupSenderImageView;
+            messageReceiverPicture = itemView.messageGroupReceiverImageView;
         }
     }
 }
