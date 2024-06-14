@@ -163,9 +163,9 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
         }
 
         if(fromUserID.equals(messageSenderId)){
-            groupMessagesViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            groupMessagesViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onLongClick(View v) {
                     if(groupMessages.getType().equals("text")){
                         CharSequence options [] = new CharSequence[]
                                 {
@@ -191,13 +191,13 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
 
                         builder.show();
                     }
+                    return true;
                 }
             });
-        }
-        else {
-            groupMessagesViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        } else {
+            groupMessagesViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onLongClick(View v) {
                     if(groupMessages.getType().equals("text")){
                         CharSequence options [] = new CharSequence[]
                                 {
@@ -219,6 +219,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
 
                         builder.show();
                     }
+                    return true;
                 }
             });
         }
