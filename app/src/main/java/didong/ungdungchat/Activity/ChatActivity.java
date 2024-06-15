@@ -257,6 +257,7 @@ public class ChatActivity extends AppCompatActivity {
                 });
         scrollToBottom();
         loadMessages();
+        scrollToBottom();
     }
 
 
@@ -347,7 +348,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        scrollToBottom();
                     }
                 });
         binding.btnSendFile.setOnClickListener(new View.OnClickListener() {
@@ -396,6 +397,7 @@ public class ChatActivity extends AppCompatActivity {
     {
         super.onStart();
         updateUserStatus("online");
+        scrollToBottom();
     }
 
     private void SendMessage() {
@@ -510,7 +512,7 @@ public class ChatActivity extends AppCompatActivity {
         binding.privateMessagesListOfUsers.post(new Runnable() {
             @Override
             public void run() {
-                binding.privateMessagesListOfUsers.smoothScrollToPosition(Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+                binding.privateMessagesListOfUsers.smoothScrollToPosition(messagesList.size());
             }
         });
     }
