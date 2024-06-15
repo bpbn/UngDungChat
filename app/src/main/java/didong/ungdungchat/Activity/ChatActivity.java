@@ -255,7 +255,7 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     }
                 });
-
+        scrollToBottom();
         loadMessages();
     }
 

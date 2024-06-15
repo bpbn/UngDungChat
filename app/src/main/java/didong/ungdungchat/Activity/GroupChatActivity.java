@@ -190,6 +190,7 @@ public class GroupChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SaveMessageInfoToDatabase();
                 binding.inputGroupMessage.setText("");
+                scrollToBottom();
             }
         });
 
@@ -256,6 +257,7 @@ public class GroupChatActivity extends AppCompatActivity {
                         }
                     }
                 });
+        scrollToBottom();
         loadMessages();
     }
 
@@ -274,31 +276,35 @@ public class GroupChatActivity extends AppCompatActivity {
                 if(groupMessages != null && !groupMessagesList.contains(groupMessages)){
                     groupMessagesList.add(groupMessages);
                     groupMessagesAdapter.notifyDataSetChanged();
-                    binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
+                    scrollToBottom();
                 }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                groupMessagesAdapter.notifyDataSetChanged();
-                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
+                scrollToBottom();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                groupMessagesAdapter.notifyDataSetChanged();
-                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                groupMessagesAdapter.notifyDataSetChanged();
-                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
+                scrollToBottom();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
 
+    void scrollToBottom() {
+        binding.groupsMessagesListOfUsers.post(new Runnable() {
+            @Override
+            public void run() {
+                binding.groupsMessagesListOfUsers.smoothScrollToPosition(Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
             }
         });
     }

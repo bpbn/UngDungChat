@@ -123,7 +123,6 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                                 groupMessagesViewHolder.txtSenderMess.setVisibility(View.GONE);
                             } else if(revoke.equals(messageSenderId) && !revoke.equals(fromUserID)){
                                 groupMessagesViewHolder.txtReceiverName.setVisibility(View.GONE);
-                                groupMessagesViewHolder.txtReceiverName.setVisibility(View.GONE);
                                 groupMessagesViewHolder.txtReceiverMess.setVisibility(View.GONE);
                                 groupMessagesViewHolder.imgReceiver.setVisibility(View.GONE);
                             }
@@ -190,28 +189,7 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                     });
                 }
             } else if (fromMessageType.equals("image")) {
-                groupRef.child("messages").child(groupMessages.getMessageID()).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists() && snapshot.hasChild("revoke")) {
-                            String revoke = snapshot.child("revoke").getValue().toString();
 
-                            if(revoke.equals(messageSenderId) && revoke.equals(fromUserID)){
-                                groupMessagesViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
-                                groupMessagesViewHolder.messageSenderPicture.setVisibility(View.GONE);
-                            } else if(revoke.equals(messageSenderId) && !revoke.equals(fromUserID)){
-                                groupMessagesViewHolder.imgReceiver.setVisibility(View.GONE);
-                                groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
-                                groupMessagesViewHolder.messageReceiverPicture.setVisibility(View.GONE);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 if (fromUserID.equals(messageSenderId)) {
                     groupRef.child("messages").child(groupMessages.getMessageID()).addValueEventListener(new ValueEventListener() {
                         @Override
@@ -242,7 +220,6 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                         }
                     });
                 } else {
-                    groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
                     groupMessagesViewHolder.txtReceiverName.setVisibility(View.VISIBLE);
                     groupMessagesViewHolder.imgReceiver.setVisibility(View.VISIBLE);
 
@@ -253,12 +230,14 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                                 String mess = snapshot.child("message").getValue().toString();
 
                                 if(mess.equals("Thu hồi")){
+                                    groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
                                     groupMessagesViewHolder.txtReceiverMess.setVisibility(View.VISIBLE);
                                     groupMessagesViewHolder.txtReceiverMess.setBackgroundResource(R.drawable.receiver_messages_layout);
 
                                     groupMessagesViewHolder.txtReceiverMess.setTextColor(Color.GRAY);
                                     groupMessagesViewHolder.txtReceiverMess.setText("Tin nhắn đã bị thu hồi");
                                 }else {
+                                    groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
                                     groupMessagesViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
 
                                     Picasso.get().load(groupMessages.getMessage()).into(groupMessagesViewHolder.messageReceiverPicture);
@@ -295,6 +274,27 @@ public class GroupMessagesAdapter extends RecyclerView.Adapter<GroupMessagesAdap
                         }
                     });
             }
+                groupRef.child("messages").child(groupMessages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists() && snapshot.hasChild("revoke")) {
+                            String revoke = snapshot.child("revoke").getValue().toString();
+
+                            if(revoke.equals(messageSenderId) && revoke.equals(fromUserID)){
+                                groupMessagesViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
+                            } else if(revoke.equals(messageSenderId) && !revoke.equals(fromUserID)){
+                                groupMessagesViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
+                                groupMessagesViewHolder.imgReceiver.setVisibility(View.GONE);
+                                groupMessagesViewHolder.txtReceiverName.setVisibility(View.GONE);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
         }
 
         if(fromUserID.equals(messageSenderId)){

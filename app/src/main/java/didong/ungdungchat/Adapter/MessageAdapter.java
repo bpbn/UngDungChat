@@ -177,32 +177,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         });
             }
         } else if (fromMessageType.equals("image")) {
-            rootRef.child("Messages")
-                    .child(messages.getFrom())
-                    .child(messages.getTo())
-                    .child("chats")
-                    .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists() && snapshot.hasChild("revoke")) {
-                                String revoke = snapshot.child("revoke").getValue().toString();
 
-                                if (revoke.equals(messageSenderId) && revoke.equals(fromUserID)) {
-                                    messageViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
-                                    messageViewHolder.messageSenderPicture.setVisibility(View.GONE);
-                                } else if (revoke.equals(messageSenderId) && !revoke.equals(fromUserID)) {
-                                    messageViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
-                                    messageViewHolder.messageReceiverPicture.setVisibility(View.GONE);
-                                    messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
             if (fromUserID.equals(messageSenderId)) {
                 rootRef.child("Messages")
                         .child(messages.getFrom())
@@ -239,8 +214,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             } else {
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 rootRef.child("Messages")
-                        .child(messages.getFrom())
                         .child(messages.getTo())
+                        .child(messages.getFrom())
                         .child("chats")
                         .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
                             @Override
@@ -249,6 +224,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                                     String mess = snapshot.child("message").getValue().toString();
 
                                     if (mess.equals("Thu hồi")) {
+                                        messageViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
                                         messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
                                         messageViewHolder.receiverMessageText.setPadding(20, 20, 20, 20);
 
@@ -292,6 +268,30 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     }
                 });
             }
+            rootRef.child("Messages")
+                    .child(messages.getFrom())
+                    .child(messages.getTo())
+                    .child("chats")
+                    .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists() && snapshot.hasChild("revoke")) {
+                                String revoke = snapshot.child("revoke").getValue().toString();
+
+                                if (revoke.equals(messageSenderId) && revoke.equals(fromUserID)) {
+                                    messageViewHolder.senderMessageImageLayout.setVisibility(View.GONE);
+                                } else if (revoke.equals(messageSenderId) && !revoke.equals(fromUserID)) {
+                                    messageViewHolder.receiverMessageImageLayout.setVisibility(View.GONE);
+                                    messageViewHolder.receiverProfileImage.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
         }
         else {
             if (fromUserID.equals(messageSenderId)) {
