@@ -108,12 +108,14 @@ public class ProfileActivity extends AppCompatActivity {
         UserRef.child(receiverUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if ((snapshot.exists()) && (snapshot.hasChild("image"))) {
+                if ((snapshot.exists()) && ((snapshot.hasChild("image")) || (snapshot.hasChild("coverImage")))) {
                     String userImage = snapshot.child("image").getValue().toString();
+                    String userCoverImage = snapshot.child("coverImage").getValue().toString();
                     String userName = snapshot.child("name").getValue().toString();
                     String userStatus = snapshot.child("status").getValue().toString();
 
                     Picasso.get().load(userImage).into(binding.visitProfileImage);
+                    Picasso.get().load(userCoverImage).into(binding.visitBackgroundImage);
                     binding.visitUserName.setText(userName);
                     binding.visitUserStatus.setText(userStatus);
 
