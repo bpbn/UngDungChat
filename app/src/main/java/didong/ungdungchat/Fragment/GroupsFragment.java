@@ -1,9 +1,11 @@
 package didong.ungdungchat.Fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -12,7 +14,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,7 +41,7 @@ public class GroupsFragment extends Fragment {
     FragmentGroupsBinding binding;
     private GroupsAdapter groupsAdapter;
     private List<Groups> listGroup = new ArrayList<>();
-    private DatabaseReference GroupRef;
+    private DatabaseReference groupRef, rootRef;
     private FirebaseAuth mAuth;
     private String currentUserID;
     public GroupsFragment() {}
@@ -48,7 +53,8 @@ public class GroupsFragment extends Fragment {
         binding = FragmentGroupsBinding.bind(view);
 
         mAuth = FirebaseAuth.getInstance();
-        GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        groupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
+        rootRef = FirebaseDatabase.getInstance().getReference();
         intializeFields();
         retrieveAndDisplayGroup();
 
@@ -67,6 +73,41 @@ public class GroupsFragment extends Fragment {
                 startActivity(groupChatIntent);
             }
         });
+
+        binding.listGroups.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Groups groups = (Groups) parent.getItemAtPosition(position);
+                String currentGroupName = groups.getName();
+                String currentGroupID = groups.getGroupID();
+                CharSequence options [] = new CharSequence[]
+                        {
+                                "Xóa nhóm",
+                                "Hủy"
+                        };
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialog);
+                builder.setTitle("Bạn có muốn xóa nhóm?");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int position) {
+                        if(position == 0){
+                            rootRef.child("Groups").child(currentGroupID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        Toast.makeText(getContext(), "Đã xóa nhóm " + currentGroupName, Toast.LENGTH_SHORT ).show();
+                                    }
+                                }
+                            });
+                        } else {
+                            dialog.cancel();
+                        }
+                    }
+                });
+                builder.show();
+                return true;
+            }
+        });
         return view;
     }
 
@@ -77,7 +118,7 @@ public class GroupsFragment extends Fragment {
     }
     private void retrieveAndDisplayGroup() {
         currentUserID = mAuth.getCurrentUser().getUid();
-        GroupRef.addValueEventListener(new ValueEventListener() {
+        groupRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listGroup.clear();
