@@ -62,10 +62,13 @@ public class SettingActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+    private ActivityResultLauncher<Intent> activityResultLauncherCover;
     private StorageReference userProfileImageRef;
     private ProgressDialog loadingBar;
     private Dialog dialog;
     private Uri selectedImageUri; // Store the selected image URI
+    private Uri selectedCoverImageUri;
+    private String currentCoverImageUrl; // Store the current cover image URL
     private String currentProfileImageUrl; // Store the current profile image URL
 
     @Override
@@ -101,6 +104,21 @@ public class SettingActivity extends AppCompatActivity {
                     }
                 });
 
+        activityResultLauncherCover = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent data = result.getData();
+                            if (data != null && data.getData() != null) {
+                                selectedCoverImageUri = data.getData();
+                                binding.coverImage.setImageURI(selectedCoverImageUri);
+                            }
+                        }
+                    }
+                });
+
         binding.btnSettingUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,6 +133,16 @@ public class SettingActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
                 activityResultLauncher.launch(intent);
+            }
+        });
+
+        binding.coverImage.setOnClickListener(new View.OnClickListener() { // Add this
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                activityResultLauncherCover.launch(intent); // Add this
             }
         });
 
@@ -290,7 +318,7 @@ public class SettingActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Uri> task) {
                                 if (task.isSuccessful()) {
                                     String downloadUrl = task.getResult().toString();
-                                    saveUserInfo(name, status, downloadUrl);
+                                    saveUserInfo(name, status, downloadUrl, currentCoverImageUrl);
                                 } else {
                                     Toast.makeText(SettingActivity.this, "Không nhận được hình ảnh", Toast.LENGTH_SHORT).show();
                                     loadingBar.dismiss();
@@ -304,44 +332,74 @@ public class SettingActivity extends AppCompatActivity {
                 }
             });
         } else {
-            saveUserInfo(name, status, currentProfileImageUrl);
+            saveUserInfo(name, status, currentProfileImageUrl, currentCoverImageUrl);
+        }
+        if (selectedCoverImageUri != null) {
+            StorageReference coverFilePath = userProfileImageRef.child(currentUserID + "_cover.jpg");
+            coverFilePath.putFile(selectedCoverImageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        coverFilePath.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    String coverDownloadUrl = task.getResult().toString();
+                                    saveUserInfo(name, status, currentProfileImageUrl, coverDownloadUrl);
+                                } else {
+                                    Toast.makeText(SettingActivity.this, "Không nhận được hình ảnh bìa", Toast.LENGTH_SHORT).show();
+                                    loadingBar.dismiss();
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(SettingActivity.this, "Không nhận được hình ảnh bìa", Toast.LENGTH_SHORT).show();
+                        loadingBar.dismiss();
+                    }
+                }
+            });
+        } else {
+            saveUserInfo(name, status, currentProfileImageUrl, currentCoverImageUrl);
         }
     }
 // lưu vào firebase
-    private void saveUserInfo(String name, String status, String imageUrl) {
-        HashMap<String, Object> profileMap = new HashMap<>();
-        profileMap.put("uid", currentUserID);
-        profileMap.put("name", name);
-        profileMap.put("status", status);
-        if (imageUrl != null) {
-            profileMap.put("image", imageUrl);
-        }
-
-        RootRef.child("Users").child(currentUserID).setValue(profileMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            sendUserToMainActivity();
-                            Toast.makeText(SettingActivity.this, "Hồ sơ được cập nhật thành công", Toast.LENGTH_SHORT).show();
-                        } else {
-                            String message = task.getException().toString();
-                            Toast.makeText(SettingActivity.this, "Không thể cập nhật được hồ sơ", Toast.LENGTH_SHORT).show();
-                        }
-                        loadingBar.dismiss();
-                    }
-                });
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (task.isSuccessful()) {
-                            RootRef.child("Users").child(currentUserID).child("device_token")
-                                    .setValue(task.getResult());
-                        }
-                    }
-                });
+private void saveUserInfo(String name, String status, String profileImageUrl, String coverImageUrl) {
+    HashMap<String, Object> profileMap = new HashMap<>();
+    profileMap.put("uid", currentUserID);
+    profileMap.put("name", name);
+    profileMap.put("status", status);
+    if (profileImageUrl != null) {
+        profileMap.put("image", profileImageUrl);
     }
+    if (coverImageUrl != null) {
+        profileMap.put("coverImage", coverImageUrl);
+    }
+
+    RootRef.child("Users").child(currentUserID).setValue(profileMap)
+            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        sendUserToMainActivity();
+                        Toast.makeText(SettingActivity.this, "Hồ sơ được cập nhật thành công", Toast.LENGTH_SHORT).show();
+                    } else {
+                        String message = task.getException().toString();
+                        Toast.makeText(SettingActivity.this, "Không thể cập nhật được hồ sơ", Toast.LENGTH_SHORT).show();
+                    }
+                    loadingBar.dismiss();
+                }
+            });
+    FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull Task<String> task) {
+                    if (task.isSuccessful()) {
+                        RootRef.child("Users").child(currentUserID).child("device_token")
+                                .setValue(task.getResult());
+                    }
+                }
+            });
+}
 // Hiển thị thông tin hồ sơ
     private void retrieveUserInfo() {
         RootRef.child("Users").child(currentUserID)
@@ -352,6 +410,7 @@ public class SettingActivity extends AppCompatActivity {
                             String userName = snapshot.child("name").getValue(String.class);
                             String status = snapshot.child("status").getValue(String.class);
                             currentProfileImageUrl = snapshot.child("image").getValue(String.class);
+                            currentCoverImageUrl = snapshot.child("coverImage").getValue(String.class);
 
                             if (userName != null) {
                                 binding.username.setText(userName);
@@ -363,6 +422,9 @@ public class SettingActivity extends AppCompatActivity {
 
                             if (currentProfileImageUrl != null && !currentProfileImageUrl.isEmpty()) {
                                 Picasso.get().load(currentProfileImageUrl).into(binding.profileImage);
+                            }
+                            if (currentCoverImageUrl != null && !currentCoverImageUrl.isEmpty()) {
+                                Picasso.get().load(currentCoverImageUrl).into(binding.coverImage);
                             }
                         } else {
                             Toast.makeText(SettingActivity.this, "Vui lòng nhập thông tin hồ sơ của bạn", Toast.LENGTH_SHORT).show();
