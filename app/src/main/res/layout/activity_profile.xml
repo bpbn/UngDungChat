@@ -5,8 +5,16 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/profile_activity"
+
     tools:context=".Activity.ProfileActivity">
+
+    <ImageView
+        android:id="@+id/visit_background_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/img_bg" />
+
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/visit_profile_image"
@@ -14,7 +22,7 @@
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="110dp"
+        android:layout_marginTop="170dp"
         android:src="@drawable/baseline_account_circle_24"/>
 
     <TextView
