@@ -17,6 +17,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import didong.ungdungchat.Activity.MainActivity;
+import didong.ungdungchat.R;
 
 public class PushNotificationService extends FirebaseMessagingService {
     @Override
@@ -49,7 +50,7 @@ public class PushNotificationService extends FirebaseMessagingService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pendingIntent);
         Notification notification = builder.build();
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

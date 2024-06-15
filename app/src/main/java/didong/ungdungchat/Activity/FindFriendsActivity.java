@@ -159,7 +159,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                         if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
-                            Picasso.get().load(model.getImage()).into(holder.profileImage);
+                            Picasso.get().load(model.getImage()).placeholder(R.drawable.baseline_account_circle_24).into(holder.profileImage);
 
                             holder.itemView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -210,7 +210,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                         if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
-                            Picasso.get().load(model.getImage()).into(holder.profileImage);
+                            Picasso.get().load(model.getImage()).placeholder(R.drawable.baseline_account_circle_24).into(holder.profileImage);
 
                             holder.itemView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -255,7 +255,7 @@ public class FindFriendsActivity extends AppCompatActivity {
                         if (!contactsList.contains(userIDs) && !requestsSentList.contains(userIDs) && !userIDs.equals(currentUserID)) {
                             holder.userName.setText(model.getName());
                             holder.userStatus.setText(model.getStatus());
-                            Picasso.get().load(model.getImage()).into(holder.profileImage);
+                            Picasso.get().load(model.getImage()).placeholder(R.drawable.baseline_account_circle_24).into(holder.profileImage);
 
                             holder.itemView.setOnClickListener(new View.OnClickListener() {
                                 @Override

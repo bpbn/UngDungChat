@@ -116,6 +116,7 @@ public class ContactsFragment extends Fragment {
         adapter = new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull ContactsViewHolder holder, int position, @NonNull Contacts model) {
+                final String[] retImage = {"default_image"};
                 String userIDs = getRef(position).getKey();
                 holder.chatIButton.setVisibility(View.VISIBLE);
                 holder.chatIButton.setImageResource(R.drawable.baseline_chat_24);
@@ -123,6 +124,7 @@ public class ContactsFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
+                            final String retName = snapshot.child("name").getValue().toString();
                             if (snapshot.child("userState").hasChild("state")) {
                                 String state = snapshot.child("userState").child("state").getValue().toString();
                                 if (state.equals("online")) {
@@ -153,13 +155,16 @@ public class ContactsFragment extends Fragment {
                             holder.chatIButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    String visit_user_name = snapshot.child("name").getValue().toString();
-                                    String visit_user_image = snapshot.child("image").getValue().toString();
+                                    if (snapshot.hasChild("image"))
+                                    {
+                                        retImage[0] = snapshot.child("image").getValue().toString();
+                                        Picasso.get().load(retImage[0]).into(holder.profileImage);
+                                    }
 
                                     Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                     chatIntent.putExtra("visit_user_id", userIDs);
-                                    chatIntent.putExtra("visit_user_name", visit_user_name);
-                                    chatIntent.putExtra("visit_image", visit_user_image);
+                                    chatIntent.putExtra("visit_user_name", retName);
+                                    chatIntent.putExtra("visit_image", retImage[0]);
                                     chatIntent.putExtra("visit_user_device_token", snapshot.child("device_token").getValue().toString());
                                     chatIntent.putExtra("user_name", userName);
 
