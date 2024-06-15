@@ -227,6 +227,16 @@ public class ContactsFragment extends Fragment {
                     public void onCancelled(@NonNull DatabaseError error) {
                     }
                 });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String visit_user_id = getRef(position).getKey();
+                        Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                        profileIntent.putExtra("visit_user_id", visit_user_id);
+                        startActivity(profileIntent);
+                    }
+                });
             }
 
             @NonNull
@@ -272,6 +282,23 @@ public class ContactsFragment extends Fragment {
                         holder.userName.setText(profileName);
                         holder.userStatus.setText(profileStatus);
                     }
+
+                    holder.chatIButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String visit_user_name = snapshot.child("name").getValue().toString();
+                            String visit_user_image = snapshot.child("image").getValue().toString();
+
+                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                            chatIntent.putExtra("visit_user_id", userIDs);
+                            chatIntent.putExtra("visit_user_name", visit_user_name);
+                            chatIntent.putExtra("visit_image", visit_user_image);
+                            chatIntent.putExtra("visit_user_device_token", snapshot.child("device_token").getValue().toString());
+                            chatIntent.putExtra("user_name", userName);
+
+                            startActivity(chatIntent);
+                        }
+                    });
                 }
             }
 
