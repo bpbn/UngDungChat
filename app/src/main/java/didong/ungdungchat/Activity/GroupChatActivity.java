@@ -179,7 +179,7 @@ public class GroupChatActivity extends AppCompatActivity {
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups");
 
-        InitializeFields();
+        initializeFields();
         getUserInfo();
         groupChatBarBinding.customGroupName.setText(currentGroupName);
         Picasso.get().load(currentGroupImage).placeholder(R.drawable.baseline_groups_24).into(groupChatBarBinding.customGroupImage);
@@ -256,11 +256,10 @@ public class GroupChatActivity extends AppCompatActivity {
                         }
                     }
                 });
+        loadMessages();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void loadMessages(){
         GroupNameRef.child(currentGroupID).child("messages").addChildEventListener(new ChildEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -295,7 +294,7 @@ public class GroupChatActivity extends AppCompatActivity {
         updateUserStatus("online");
     }
 
-    private void InitializeFields() {
+    private void initializeFields() {
         setSupportActionBar(binding.groupChatBarLayout);
         Objects.requireNonNull(getSupportActionBar()).setTitle("");
         ActionBar actionBar = getSupportActionBar();

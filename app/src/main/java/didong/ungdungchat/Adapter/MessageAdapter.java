@@ -89,7 +89,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         messageViewHolder.messageSenderPicture.setVisibility(View.GONE);
         messageViewHolder.messageReceiverPicture.setVisibility(View.GONE);
 
-
         if (fromMessageType.equals("text")) {
             rootRef.child("Messages")
                     .child(messages.getFrom())
@@ -120,28 +119,62 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.senderMessageText.setPadding(20, 20, 20, 20);
 
-
                 messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-                if (message.equals("Thu hồi")) {
-                    messageViewHolder.senderMessageText.setTextColor(Color.GRAY);
-                    messageViewHolder.senderMessageText.setText("Bạn đã thu hồi một tin nhắn");
-                } else {
-                    messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
-                    messageViewHolder.senderMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
-                }
+                rootRef.child("Messages")
+                        .child(messages.getFrom())
+                        .child(messages.getTo())
+                        .child("chats")
+                        .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists() && snapshot.hasChild("message")) {
+                                    String mess = snapshot.child("message").getValue().toString();
+
+                                    if (mess.equals("Thu hồi")) {
+                                        messageViewHolder.senderMessageText.setTextColor(Color.GRAY);
+                                        messageViewHolder.senderMessageText.setText("Bạn đã thu hồi một tin nhắn");
+                                    } else {
+                                        messageViewHolder.senderMessageText.setTextColor(Color.BLACK);
+                                        messageViewHolder.senderMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
             } else {
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
                 messageViewHolder.receiverMessageText.setPadding(20, 20, 20, 20);
 
                 messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                if (message.equals("Thu hồi")) {
-                    messageViewHolder.receiverMessageText.setTextColor(Color.GRAY);
-                    messageViewHolder.receiverMessageText.setText("Tin nhắn đã bị thu hồi");
-                } else {
-                    messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
-                    messageViewHolder.receiverMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
-                }
+                rootRef.child("Messages")
+                        .child(messages.getFrom())
+                        .child(messages.getTo())
+                        .child("chats")
+                        .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists() && snapshot.hasChild("message")) {
+                                    String mess = snapshot.child("message").getValue().toString();
+
+                                    if (mess.equals("Thu hồi")) {
+                                        messageViewHolder.receiverMessageText.setTextColor(Color.GRAY);
+                                        messageViewHolder.receiverMessageText.setText("Tin nhắn đã bị thu hồi");
+                                    } else {
+                                        messageViewHolder.receiverMessageText.setTextColor(Color.BLACK);
+                                        messageViewHolder.receiverMessageText.setText(messages.getMessage() + "\n \n" + messages.getTime() + " - " + messages.getDate());
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
             }
         } else if (fromMessageType.equals("image")) {
             rootRef.child("Messages")
@@ -171,38 +204,72 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         }
                     });
             if (fromUserID.equals(messageSenderId)) {
-                if (message.equals("Thu hồi")) {
-                    messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
-                    messageViewHolder.senderMessageText.setPadding(20, 20, 20, 20);
+                rootRef.child("Messages")
+                        .child(messages.getFrom())
+                        .child(messages.getTo())
+                        .child("chats")
+                        .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists() && snapshot.hasChild("message")) {
+                                    String mess = snapshot.child("message").getValue().toString();
 
-                    messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-                    messageViewHolder.senderMessageText.setTextColor(Color.GRAY);
-                    messageViewHolder.senderMessageText.setText("Bạn đã thu hồi một tin nhắn");
-                } else {
-                    messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
-                    messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+                                    if (mess.equals("Thu hồi")) {
+                                        messageViewHolder.senderMessageText.setVisibility(View.VISIBLE);
+                                        messageViewHolder.senderMessageText.setPadding(20, 20, 20, 20);
 
-                    Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
-                    messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
-                    messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
-                }
+                                        messageViewHolder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
+                                        messageViewHolder.senderMessageText.setTextColor(Color.GRAY);
+                                        messageViewHolder.senderMessageText.setText("Bạn đã thu hồi một tin nhắn");
+                                    } else {
+                                        messageViewHolder.senderMessageImageLayout.setVisibility(View.VISIBLE);
+                                        messageViewHolder.messageSenderPicture.setVisibility(View.VISIBLE);
+
+                                        Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageSenderPicture);
+                                        messageViewHolder.senderMessageTime.setVisibility(View.VISIBLE);
+                                        messageViewHolder.senderMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
             } else {
                 messageViewHolder.receiverProfileImage.setVisibility(View.VISIBLE);
-                if (message.equals("Thu hồi")) {
-                    messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
-                    messageViewHolder.receiverMessageText.setPadding(20, 20, 20, 20);
+                rootRef.child("Messages")
+                        .child(messages.getFrom())
+                        .child(messages.getTo())
+                        .child("chats")
+                        .child(messages.getMessageID()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists() && snapshot.hasChild("message")) {
+                                    String mess = snapshot.child("message").getValue().toString();
 
-                    messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-                    messageViewHolder.receiverMessageText.setTextColor(Color.GRAY);
-                    messageViewHolder.receiverMessageText.setText("Tin nhắn đã bị thu hồi");
-                } else {
-                    messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
-                    messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+                                    if (mess.equals("Thu hồi")) {
+                                        messageViewHolder.receiverMessageText.setVisibility(View.VISIBLE);
+                                        messageViewHolder.receiverMessageText.setPadding(20, 20, 20, 20);
 
-                    Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
-                    messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
-                    messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
-                }
+                                        messageViewHolder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
+                                        messageViewHolder.receiverMessageText.setTextColor(Color.GRAY);
+                                        messageViewHolder.receiverMessageText.setText("Tin nhắn đã bị thu hồi");
+                                    } else {
+                                        messageViewHolder.receiverMessageImageLayout.setVisibility(View.VISIBLE);
+                                        messageViewHolder.messageReceiverPicture.setVisibility(View.VISIBLE);
+
+                                        Picasso.get().load(messages.getMessage()).into(messageViewHolder.messageReceiverPicture);
+                                        messageViewHolder.receiverMessageTime.setVisibility(View.VISIBLE);
+                                        messageViewHolder.receiverMessageTime.setText(messages.getTime() + " - " + messages.getDate());
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                 messageViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -354,7 +421,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     private void deleteMessage ( int position, MessageViewHolder holder){
-        rootRef = FirebaseDatabase.getInstance().getReference();
         rootRef.child("Messages")
                 .child(userMessagesList.get(position).getFrom())
                 .child(userMessagesList.get(position).getTo())
