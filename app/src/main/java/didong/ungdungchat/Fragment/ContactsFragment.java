@@ -38,7 +38,7 @@ public class ContactsFragment extends Fragment {
     private FragmentContactsBinding binding;
     private DatabaseReference contactsRef, usersRef;
     private FirebaseAuth mAuth;
-    private String currentUserID;
+    private String currentUserID, currentUserName, userName;
     private FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter;
 
     public ContactsFragment() {
@@ -96,6 +96,19 @@ public class ContactsFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
+        usersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    currentUserName = snapshot.child("name").getValue().toString();
+                    userName = currentUserName;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
                 .setQuery(contactsRef, Contacts.class)
                 .build();
@@ -147,6 +160,8 @@ public class ContactsFragment extends Fragment {
                                     chatIntent.putExtra("visit_user_id", userIDs);
                                     chatIntent.putExtra("visit_user_name", visit_user_name);
                                     chatIntent.putExtra("visit_image", visit_user_image);
+                                    chatIntent.putExtra("visit_user_device_token", snapshot.child("device_token").getValue().toString());
+                                    chatIntent.putExtra("user_name", userName);
 
                                     startActivity(chatIntent);
                                 }

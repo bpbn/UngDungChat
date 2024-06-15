@@ -355,9 +355,9 @@ public class ChatActivity extends AppCompatActivity {
             {
                 CharSequence options[] = new CharSequence[]
                         {
-                                "Images",
-                                "PDF Files",
-                                "Files"
+                                "Ảnh",
+                                "PDF",
+                                "Tài liệu"
                         };
                 AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
                 builder.setTitle("Select the File");

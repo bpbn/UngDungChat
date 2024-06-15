@@ -27,13 +27,14 @@ import java.util.HashMap;
 
 import didong.ungdungchat.Model.Contacts;
 import didong.ungdungchat.R;
+import didong.ungdungchat.Services.SendNotification;
 import didong.ungdungchat.databinding.ActivityProfileBinding;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private String receiverUserID, senderUserID, Current_State, cUID;
     ActivityProfileBinding binding;
-    private DatabaseReference UserRef, ChatRequestRef, ContactsRef, NotificationRef, RootRef;
+    private DatabaseReference UserRef, ChatRequestRef, ContactsRef, RootRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -54,7 +55,6 @@ public class ProfileActivity extends AppCompatActivity {
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
         ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
-        NotificationRef = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
         receiverUserID = getIntent().getExtras().get("visit_user_id").toString();
         senderUserID = mAuth.getCurrentUser().getUid();
@@ -326,21 +326,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                HashMap<String, String> chatNotificationMap = new HashMap<>();
-                                                chatNotificationMap.put("from", senderUserID);
-                                                chatNotificationMap.put("type", "request");
-                                                NotificationRef.child(receiverUserID).push()
-                                                        .setValue(chatNotificationMap)
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    binding.sendMessageRequestButton.setEnabled(true);
-                                                                    Current_State = "request_sent";
-                                                                    binding.sendMessageRequestButton.setText("Huỷ lời mời");
-                                                                }
-                                                            }
-                                                        });
+                                                new SendNotification(receiverUserID, "Lời mời kết bạn", "Bạn có một lời mời kết bạn", ProfileActivity.this).send();
                                             }
                                         }
                                     });
