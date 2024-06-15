@@ -219,7 +219,7 @@ public class ChatActivity extends AppCompatActivity {
             {
                 new SendNotification(messageReceiverDeviceToken, userName, binding.tvMessage.getText().toString(), ChatActivity.this).send();
                 SendMessage();
-
+                scrollToBottom();
             }
         });
 
@@ -244,7 +244,7 @@ public class ChatActivity extends AppCompatActivity {
                             // keyboard is opened
                             if (!isKeyboardShowing) {
                                 isKeyboardShowing = true;
-                                binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+                                scrollToBottom();
                             }
                         }
                         else {
@@ -369,16 +369,19 @@ public class ChatActivity extends AppCompatActivity {
                         {
                             checker = "image";
                             mStartForResult.launch("image/*");
+                            scrollToBottom();
                         }
                         if (which == 1)
                         {
                             checker = "pdf";
                             mStartForResult.launch("application/pdf");
+                            scrollToBottom();
                         }
                         if (which == 2)
                         {
                             checker = "file";
                             mStartForResult.launch("*/*");
+                            scrollToBottom();
                         }
                     }
                 });
@@ -394,8 +397,6 @@ public class ChatActivity extends AppCompatActivity {
         super.onStart();
         updateUserStatus("online");
     }
-
-
 
     private void SendMessage() {
         String messageText = binding.tvMessage.getText().toString().trim();
@@ -431,6 +432,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (task.isSuccessful())
                 {
 //                    Toast.makeText(ChatActivity.this, "Message Sent Successfully...", Toast.LENGTH_SHORT).show();
+                    binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
                 }
                 else
                 {
@@ -441,6 +443,7 @@ public class ChatActivity extends AppCompatActivity {
             Long tsLong = System.currentTimeMillis()/1000;
             RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("timeStamp").setValue(-tsLong);
             RootRef.child("Messages").child(messageReceiverID).child(messageSenderID).child("timeStamp").setValue(-tsLong);
+            scrollToBottom();
         }
     }
 
@@ -478,29 +481,37 @@ public class ChatActivity extends AppCompatActivity {
                         messagesList.add(messages);
 
                         messageAdapter.notifyDataSetChanged();
-
-                        binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+                        scrollToBottom();
                     }
 
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                        scrollToBottom();
                     }
 
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                        scrollToBottom();
                     }
 
                     @Override
                     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
+                        scrollToBottom();
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        scrollToBottom();
                     }
                 });
+    }
+
+    void scrollToBottom() {
+        binding.privateMessagesListOfUsers.post(new Runnable() {
+            @Override
+            public void run() {
+                binding.privateMessagesListOfUsers.smoothScrollToPosition(Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+            }
+        });
     }
 }
