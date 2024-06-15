@@ -222,7 +222,8 @@ public class ContactsFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            loadUserDetails(holder, userIDs);
+                            final String[] retImage = {"default_image"};
+                            loadUserDetails(holder, userIDs, retImage);
                         } else {
                             holder.itemView.setVisibility(View.GONE);
                         }
@@ -256,11 +257,14 @@ public class ContactsFragment extends Fragment {
         searchAdapter.startListening();
     }
 
-    private void loadUserDetails(ContactsViewHolder holder, String userIDs) {
+    private void loadUserDetails(ContactsViewHolder holder, String userIDs , String[] retImage) {
+        holder.chatIButton.setVisibility(View.VISIBLE);
+        holder.chatIButton.setImageResource(R.drawable.baseline_chat_24);
         usersRef.child(userIDs).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    final String retName = snapshot.child("name").getValue().toString();
                     if (snapshot.child("userState").hasChild("state")) {
                         String state = snapshot.child("userState").child("state").getValue().toString();
                         if (state.equals("online")) {
@@ -291,13 +295,11 @@ public class ContactsFragment extends Fragment {
                     holder.chatIButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String visit_user_name = snapshot.child("name").getValue().toString();
-                            String visit_user_image = snapshot.child("image").getValue().toString();
 
                             Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                             chatIntent.putExtra("visit_user_id", userIDs);
-                            chatIntent.putExtra("visit_user_name", visit_user_name);
-                            chatIntent.putExtra("visit_image", visit_user_image);
+                            chatIntent.putExtra("visit_user_name", retName);
+                            chatIntent.putExtra("visit_image", retImage[0]);
                             chatIntent.putExtra("visit_user_device_token", snapshot.child("device_token").getValue().toString());
                             chatIntent.putExtra("user_name", userName);
 
