@@ -106,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        binding.btnPhone.setVisibility(View.GONE);
     }
     private void SignInGoogle() {
         mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
