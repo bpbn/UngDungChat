@@ -85,7 +85,7 @@ public class GroupsFragment extends Fragment {
                     if (dataSnapshot.child("members").child(currentUserID).exists()) {
                         Groups gr = dataSnapshot.getValue(Groups.class);
                         if (gr.getImage() == null) {
-                            gr.setImage(getContext().getPackageName() + R.drawable.baseline_groups_24);
+                            gr.setImage("default_group");
                         }
                         listGroup.add(gr);
                     }

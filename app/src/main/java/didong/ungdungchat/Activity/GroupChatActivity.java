@@ -337,7 +337,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private void SaveMessageInfoToDatabase() {
         String message = binding.inputGroupMessage.getText().toString();
         if(TextUtils.isEmpty(message)){
-            Toast.makeText(GroupChatActivity.this,"Please write message first...", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(GroupChatActivity.this,"Please write message first...", Toast.LENGTH_SHORT).show();
         }
         else {
             Calendar calendarDate = Calendar.getInstance();
@@ -404,11 +404,11 @@ public class GroupChatActivity extends AppCompatActivity {
     private void removeUserFromGroup() {
         GroupNameRef.child(currentGroupID).child("members").child(currentUserID).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(GroupChatActivity.this, "You have been removed from the group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupChatActivity.this, "Bạn đã rời khỏi nhóm", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(GroupChatActivity.this, FragmentGroupsBinding.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(GroupChatActivity.this, "Error occurred while removing from the group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupChatActivity.this, "Lỗi", Toast.LENGTH_SHORT).show();
             }
         });
     }

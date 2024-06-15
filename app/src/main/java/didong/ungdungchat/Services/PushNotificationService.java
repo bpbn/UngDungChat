@@ -23,7 +23,7 @@ public class PushNotificationService extends FirebaseMessagingService {
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        sendRegistrationToServer(token);
+//        sendRegistrationToServer(token);
     }
 
     private void sendRegistrationToServer(String token) {

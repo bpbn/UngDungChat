@@ -63,10 +63,22 @@ public class MainActivity extends AppCompatActivity {
                     PackageManager.PERMISSION_GRANTED) {
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: display an educational UI explaining to the user the features that will be enabled
-                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-                //       If the user selects "No thanks," allow the user to continue without notifications.
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(this)
+                        .setTitle("Permission needed")
+                        .setMessage("This permission is needed because of FCM SDK")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            // Directly ask for the permission
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            // Do nothing
+                        })
+                        .create()
+                        .show();
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
@@ -227,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String groupName = groupNameField.getText().toString();
                 if(TextUtils.isEmpty(groupName)){
-                    Toast.makeText(MainActivity.this, "Please write Group Name", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập tên nhóm", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     createNewGroup(groupName);
@@ -280,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(MainActivity.this, groupName + " group is Created Successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this, "Tạo nhóm " + groupName + " thành công", Toast.LENGTH_SHORT).show();
                                     } else {
                                         Toast.makeText(MainActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
