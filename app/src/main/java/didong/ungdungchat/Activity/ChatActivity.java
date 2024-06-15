@@ -256,6 +256,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
+        loadMessages();
     }
 
 
@@ -392,42 +393,6 @@ public class ChatActivity extends AppCompatActivity {
     {
         super.onStart();
         updateUserStatus("online");
-
-        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("chats")
-                .addChildEventListener(new ChildEventListener() {
-                    @SuppressLint("NotifyDataSetChanged")
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
-                    {
-                        Messages messages = dataSnapshot.getValue(Messages.class);
-
-                        messagesList.add(messages);
-
-                        messageAdapter.notifyDataSetChanged();
-
-                        binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
     }
 
 
@@ -498,5 +463,44 @@ public class ChatActivity extends AppCompatActivity {
         RootRef.child("Users").child(cUID).child("userState")
                 .updateChildren(onlineStateMap);
 
+    }
+
+    void loadMessages()
+    {
+        RootRef.child("Messages").child(messageSenderID).child(messageReceiverID).child("chats")
+                .addChildEventListener(new ChildEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
+                        Messages messages = dataSnapshot.getValue(Messages.class);
+
+                        messagesList.add(messages);
+
+                        messageAdapter.notifyDataSetChanged();
+
+                        binding.privateMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.privateMessagesListOfUsers.getAdapter()).getItemCount());
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 }
