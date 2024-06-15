@@ -52,6 +52,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:23.4.1")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-inappmessaging-display")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-appcheck-debug")
     implementation("com.firebaseui:firebase-ui-database:8.0.2")
@@ -80,5 +81,6 @@ dependencies {
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation("com.android.volley:volley:1.2.1")
 //    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
 }

@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef, GroupRef;
     private String currentUserID, currentUserName, cUID;
+    public String userName;
     GoogleSignInClient mGoogleSignInClient;
 
     @Override
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         askNotificationPermission();
-
+//        createChannelNotification();
     }
 
 //    @Override
@@ -251,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     currentUserName = snapshot.child("name").getValue().toString();
+                    userName = currentUserName;
                 }
             }
             @Override

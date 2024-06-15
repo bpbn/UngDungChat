@@ -33,6 +33,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import didong.ungdungchat.Activity.ChatActivity;
+import didong.ungdungchat.Activity.MainActivity;
 import didong.ungdungchat.Model.Contacts;
 import didong.ungdungchat.R;
 import didong.ungdungchat.databinding.FragmentChatsBinding;
@@ -42,7 +43,7 @@ public class ChatsFragment extends Fragment {
     FragmentChatsBinding binding;
     DatabaseReference chatsRef, usersRef;
     FirebaseAuth mAuth;
-    String currentUserID;
+    String currentUserID, currentUserName, userName;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,6 +61,19 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        usersRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    currentUserName = snapshot.child("name").getValue().toString();
+                    userName = currentUserName;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         FirebaseRecyclerOptions<Contacts> options = new FirebaseRecyclerOptions.Builder<Contacts>()
                 .setQuery(chatsRef.orderByChild("timeStamp"), Contacts.class)
                 .build();
@@ -151,6 +165,8 @@ public class ChatsFragment extends Fragment {
                                             chatIntent.putExtra("visit_user_id", usersIDs);
                                             chatIntent.putExtra("visit_user_name", retName);
                                             chatIntent.putExtra("visit_image", retImage[0]);
+                                            chatIntent.putExtra("visit_user_device_token", dataSnapshot.child("device_token").getValue().toString());
+                                            chatIntent.putExtra("user_name", userName);
                                             startActivity(chatIntent);
                                         }
                                     });

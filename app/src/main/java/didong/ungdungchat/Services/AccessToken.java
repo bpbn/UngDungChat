@@ -1,5 +1,6 @@
 package didong.ungdungchat.Services;
 
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -7,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.firebase.auth.GoogleAuthCredential;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -29,10 +31,13 @@ public class AccessToken {
                     "  \"client_x509_cert_url\": \"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ng578%40ungdungchat-9ea1c.iam.gserviceaccount.com\",\n" +
                     "  \"universe_domain\": \"googleapis.com\"\n" +
                     "}";
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+            StrictMode.setThreadPolicy(policy);
 
             InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8));
             GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream).createScoped(Lists.newArrayList(firebaseMessagingScope));
-            credentials.refresh();
+            credentials.refreshIfExpired();
             return credentials.refreshAccessToken().getTokenValue();
 
         }catch (Exception e) {

@@ -1,36 +1,24 @@
 package didong.ungdungchat.Activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,13 +30,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.type.DateTime;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.logging.LogFactory;
@@ -61,10 +46,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import didong.ungdungchat.Adapter.MessageAdapter;
 import didong.ungdungchat.Model.Messages;
 import didong.ungdungchat.R;
+import didong.ungdungchat.Services.SendNotification;
 import didong.ungdungchat.databinding.ActivityChatBinding;
 import didong.ungdungchat.databinding.CustomChatBarBinding;
 
@@ -75,7 +60,7 @@ public class ChatActivity extends AppCompatActivity {
 
     boolean isKeyboardShowing = false;
 
-    private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID, cUID, currentUserId, currentUser;
+    private String messageReceiverID, messageReceiverName, messageReceiverImage, messageSenderID, cUID, currentUserId, currentUser, userName, messageReceiverDeviceToken;
     private FirebaseAuth mAuth;
     private DatabaseReference RootRef;
 
@@ -217,6 +202,8 @@ public class ChatActivity extends AppCompatActivity {
         messageReceiverID = Objects.requireNonNull(Objects.requireNonNull(getIntent().getExtras()).get("visit_user_id")).toString();
         messageReceiverName = Objects.requireNonNull(getIntent().getExtras().get("visit_user_name")).toString();
         messageReceiverImage = Objects.requireNonNull(getIntent().getExtras().get("visit_image")).toString();
+        messageReceiverDeviceToken = Objects.requireNonNull(getIntent().getExtras().get("visit_user_device_token")).toString();
+        userName = Objects.requireNonNull(getIntent().getExtras().get("user_name")).toString();
 
 
         IntializeControllers();
@@ -230,6 +217,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
+                new SendNotification(messageReceiverDeviceToken, userName, binding.tvMessage.getText().toString(), ChatActivity.this).send();
                 SendMessage();
 
             }
