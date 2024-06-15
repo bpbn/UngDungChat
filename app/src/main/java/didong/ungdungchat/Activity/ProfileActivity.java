@@ -109,40 +109,42 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if ((snapshot.exists()) && (snapshot.hasChild("image"))) {
-                    String userImage = snapshot.child("image").getValue().toString();
-                    String userName = snapshot.child("name").getValue().toString();
-                    String userStatus = snapshot.child("status").getValue().toString();
+                    if((snapshot.hasChild("image"))){
+                        String userImage = snapshot.child("image").getValue().toString();
+                        String userName = snapshot.child("name").getValue().toString();
+                        String userStatus = snapshot.child("status").getValue().toString();
 
-                    Picasso.get().load(userImage).into(binding.visitProfileImage);
-                    binding.visitUserName.setText(userName);
-                    binding.visitUserStatus.setText(userStatus);
+                        Picasso.get().load(userImage).into(binding.visitProfileImage);
+                        binding.visitUserName.setText(userName);
+                        binding.visitUserStatus.setText(userStatus);
+                    }
 
+                    if ((snapshot.hasChild("coverImage"))) {
+                        String userCoverImage = snapshot.child("coverImage").getValue().toString();
+                        String userName = snapshot.child("name").getValue().toString();
+                        String userStatus = snapshot.child("status").getValue().toString();
+
+                        Picasso.get().load(userCoverImage).into(binding.visitBackgroundImage);
+                        binding.visitUserName.setText(userName);
+                        binding.visitUserStatus.setText(userStatus);
+                    }
+
+//                    if ((snapshot.exists()) && (snapshot.hasChild("image")) && (snapshot.hasChild("coverImage"))) {
+//                        String userImage = snapshot.child("image").getValue().toString();
+//                        String userCoverImage = snapshot.child("coverImage").getValue().toString();
+//                        String userName = snapshot.child("name").getValue().toString();
+//                        String userStatus = snapshot.child("status").getValue().toString();
+//
+//                        Picasso.get().load(userImage).into(binding.visitProfileImage);
+//                        Picasso.get().load(userCoverImage).into(binding.visitBackgroundImage);
+//                        binding.visitUserName.setText(userName);
+//                        binding.visitUserStatus.setText(userStatus);
+//
+//                        ManageChatRequests();
+//
+//                    }
                     ManageChatRequests();
-                } else if ((snapshot.exists()) && (snapshot.hasChild("coverImage"))) {
-                    String userCoverImage = snapshot.child("coverImage").getValue().toString();
-                    String userName = snapshot.child("name").getValue().toString();
-                    String userStatus = snapshot.child("status").getValue().toString();
-
-                    Picasso.get().load(userCoverImage).into(binding.visitBackgroundImage);
-                    binding.visitUserName.setText(userName);
-                    binding.visitUserStatus.setText(userStatus);
-
-                    ManageChatRequests();
-
-                } else if ((snapshot.exists()) && (snapshot.hasChild("image")) && (snapshot.hasChild("coverImage"))) {
-                    String userImage = snapshot.child("image").getValue().toString();
-                    String userCoverImage = snapshot.child("coverImage").getValue().toString();
-                    String userName = snapshot.child("name").getValue().toString();
-                    String userStatus = snapshot.child("status").getValue().toString();
-
-                    Picasso.get().load(userImage).into(binding.visitProfileImage);
-                    Picasso.get().load(userCoverImage).into(binding.visitBackgroundImage);
-                    binding.visitUserName.setText(userName);
-                    binding.visitUserStatus.setText(userStatus);
-
-                    ManageChatRequests();
-
-                } else {
+                }else {
                     String userName = snapshot.child("name").getValue().toString();
                     String userStatus = snapshot.child("status").getValue().toString();
 
