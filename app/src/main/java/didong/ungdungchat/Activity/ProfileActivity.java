@@ -58,20 +58,57 @@ public class ProfileActivity extends AppCompatActivity {
 
         receiverUserID = getIntent().getExtras().get("visit_user_id").toString();
         senderUserID = mAuth.getCurrentUser().getUid();
-//        Toast.makeText(this, "User ID: " + receiverUserID, Toast.LENGTH_SHORT).show();
         Current_State = "new";
 
         RetrieveUserInfo();
         if (cUID != null) {
             updateUserStatus("online");
         }
+
+        ContactsRef.child(senderUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.hasChild(receiverUserID)) {
+                    binding.sendMessageRequestButton.setEnabled(true);
+                    Current_State = "new";
+                    binding.sendMessageRequestButton.setText("Gửi lời mời");
+
+                    binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                    binding.declineMessageRequestButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors.
+            }
+        });
+
+        ContactsRef.child(receiverUserID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.hasChild(senderUserID)) {
+                    binding.sendMessageRequestButton.setEnabled(true);
+                    Current_State = "new";
+                    binding.sendMessageRequestButton.setText("Gửi lời mời");
+
+                    binding.declineMessageRequestButton.setVisibility(View.INVISIBLE);
+                    binding.declineMessageRequestButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors.
+            }
+        });
     }
 
     private void RetrieveUserInfo() {
         UserRef.child(receiverUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if((snapshot.exists()) && (snapshot.hasChild("image"))){
+                if ((snapshot.exists()) && (snapshot.hasChild("image"))) {
                     String userImage = snapshot.child("image").getValue().toString();
                     String userName = snapshot.child("name").getValue().toString();
                     String userStatus = snapshot.child("status").getValue().toString();
@@ -81,8 +118,7 @@ public class ProfileActivity extends AppCompatActivity {
                     binding.visitUserStatus.setText(userStatus);
 
                     ManageChatRequests();
-                }
-                else{
+                } else {
                     String userName = snapshot.child("name").getValue().toString();
                     String userStatus = snapshot.child("status").getValue().toString();
 
@@ -105,14 +141,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChild(receiverUserID)){
+                        if (snapshot.hasChild(receiverUserID)) {
                             String request_type = snapshot.child(receiverUserID).child("request_type").getValue().toString();
 
-                            if(request_type.equals("sent")){
+                            if (request_type.equals("sent")) {
                                 Current_State = "request_sent";
                                 binding.sendMessageRequestButton.setText("Huỷ lời mời");
-                            }
-                            else if (request_type.equals("received")){
+                            } else if (request_type.equals("received")) {
                                 Current_State = "request_received";
                                 binding.sendMessageRequestButton.setText("Chấp nhận lời mời");
 
@@ -126,14 +161,17 @@ public class ProfileActivity extends AppCompatActivity {
                                     }
                                 });
                             }
-                        }else {
+                        } else {
                             ContactsRef.child(senderUserID)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.hasChild(receiverUserID)){
+                                            if (snapshot.hasChild(receiverUserID)) {
                                                 Current_State = "friends";
                                                 binding.sendMessageRequestButton.setText("Huỷ kết bạn");
+                                            } else {
+                                                Current_State = "new";
+                                                binding.sendMessageRequestButton.setText("Gửi lời mời");
                                             }
                                         }
 
@@ -151,28 +189,28 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
 
-        if(!senderUserID.equals(receiverUserID)){
+        if (!senderUserID.equals(receiverUserID)) {
             binding.sendMessageRequestButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     binding.sendMessageRequestButton.setEnabled(false);
-                    if(Current_State.equals("new")){
+                    if (Current_State.equals("new")) {
                         SendChatRequests();
                     }
 
-                    if (Current_State.equals("request_sent")){
+                    if (Current_State.equals("request_sent")) {
                         CancelChatRequest();
                     }
 
-                    if (Current_State.equals("request_received")){
+                    if (Current_State.equals("request_received")) {
                         AcceptChatRequest();
                     }
-                    if (Current_State.equals("friends")){
+                    if (Current_State.equals("friends")) {
                         RemoveSpecificContact();
                     }
                 }
             });
-        }else {
+        } else {
             binding.sendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
     }
@@ -183,13 +221,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            ContactsRef.child(senderUserID).child(receiverUserID)
+                        if (task.isSuccessful()) {
+                            ContactsRef.child(receiverUserID).child(senderUserID)
                                     .removeValue()
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State = "new";
                                                 binding.sendMessageRequestButton.setText("Gửi lời mời");
@@ -210,19 +248,19 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             ContactsRef.child(receiverUserID).child(senderUserID)
                                     .child("Contacts").setValue("Saved")
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 ChatRequestRef.child(senderUserID).child(receiverUserID)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()){
+                                                                if (task.isSuccessful()) {
                                                                     ChatRequestRef.child(receiverUserID).child(senderUserID)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -254,13 +292,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            ChatRequestRef.child(senderUserID).child(receiverUserID)
+                        if (task.isSuccessful()) {
+                            ChatRequestRef.child(receiverUserID).child(senderUserID)
                                     .removeValue()
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 binding.sendMessageRequestButton.setEnabled(true);
                                                 Current_State = "new";
                                                 binding.sendMessageRequestButton.setText("Gửi lời mời");
@@ -281,14 +319,13 @@ public class ProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             ChatRequestRef.child(receiverUserID).child(senderUserID)
                                     .child("request_type").setValue("received")
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful())
-                                            {
+                                            if (task.isSuccessful()) {
                                                 HashMap<String, String> chatNotificationMap = new HashMap<>();
                                                 chatNotificationMap.put("from", senderUserID);
                                                 chatNotificationMap.put("type", "request");
@@ -297,9 +334,9 @@ public class ProfileActivity extends AppCompatActivity {
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
-                                                                if(task.isSuccessful()){
+                                                                if (task.isSuccessful()) {
                                                                     binding.sendMessageRequestButton.setEnabled(true);
-                                                                    Current_State ="request_sent";
+                                                                    Current_State = "request_sent";
                                                                     binding.sendMessageRequestButton.setText("Huỷ lời mời");
                                                                 }
                                                             }
@@ -312,8 +349,7 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateUserStatus(String state)
-    {
+    private void updateUserStatus(String state) {
         String saveCurrentTime, saveCurrentDate;
 
         Calendar calendar = Calendar.getInstance();

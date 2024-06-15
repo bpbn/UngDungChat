@@ -162,13 +162,13 @@ public class MainActivity extends AppCompatActivity {
 
         else
         {
-            VerifyUserExistance();
-            GetUserInfo();
+            verifyUserExistance();
+            getUserInfo();
             updateUserStatus("online");
         }
     }
 
-    private void VerifyUserExistance() {
+    private void verifyUserExistance() {
         FirebaseUser currentUser1 = mAuth.getCurrentUser();
         if (currentUser1 != null) {
             String currentUserId1 = currentUser1.getUid();
@@ -214,15 +214,15 @@ public class MainActivity extends AppCompatActivity {
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
-    private void RequestNewGroup() {
+    private void requestNewGroup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
-        builder.setTitle("Enter Group Name: ");
+        builder.setTitle("Nhập tên nhóm: ");
 
         final EditText groupNameField = new EditText(MainActivity.this);
-        groupNameField.setHint("e.g Coding Cafe");
+        groupNameField.setHint("ví dụ: Android");
         builder.setView(groupNameField);
 
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("TẠO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String groupName = groupNameField.getText().toString();
@@ -230,12 +230,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please write Group Name", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    CreateNewGroup(groupName);
+                    createNewGroup(groupName);
                 }
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("HỦY", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void GetUserInfo() {
+    private void getUserInfo() {
         currentUserID = currentUser.getUid();
         RootRef.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
         cUID = currentUserID;
     }
 
-    private void CreateNewGroup(String groupName) {
+    private void createNewGroup(String groupName) {
         String groupKey = RootRef.child("Groups").push().getKey();
         GroupRef = RootRef.child("Groups").child(groupKey);
 
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(item.getItemId() == R.id.main_create_groups_option)
         {
-            RequestNewGroup();
+            requestNewGroup();
         }
         if(item.getItemId() == R.id.main_find_friends_option)
         {

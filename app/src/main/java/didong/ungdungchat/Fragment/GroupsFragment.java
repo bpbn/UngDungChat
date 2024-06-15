@@ -49,7 +49,7 @@ public class GroupsFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
-        IntializeFields();
+        intializeFields();
         retrieveAndDisplayGroup();
 
         binding.listGroups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -70,7 +70,7 @@ public class GroupsFragment extends Fragment {
         return view;
     }
 
-    private void IntializeFields() {
+    private void intializeFields() {
         groupsAdapter = new GroupsAdapter(getContext(), R.layout.groups_display_layout, listGroup);
         binding.listGroups.setAdapter(groupsAdapter);
         binding.listGroups.setDivider(null);
@@ -84,6 +84,9 @@ public class GroupsFragment extends Fragment {
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()){
                     if (dataSnapshot.child("members").child(currentUserID).exists()) {
                         Groups gr = dataSnapshot.getValue(Groups.class);
+                        if (gr.getImage() == null) {
+                            gr.setImage(getContext().getPackageName() + R.drawable.baseline_groups_24);
+                        }
                         listGroup.add(gr);
                     }
                 }
