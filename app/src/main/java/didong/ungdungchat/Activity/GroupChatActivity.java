@@ -259,6 +259,12 @@ public class GroupChatActivity extends AppCompatActivity {
         loadMessages();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateUserStatus("online");
+    }
+
     private void loadMessages(){
         GroupNameRef.child(currentGroupID).child("messages").addChildEventListener(new ChildEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -274,16 +280,20 @@ public class GroupChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                groupMessagesAdapter.notifyDataSetChanged();
+                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
+                groupMessagesAdapter.notifyDataSetChanged();
+                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                groupMessagesAdapter.notifyDataSetChanged();
+                binding.groupsMessagesListOfUsers.smoothScrollToPosition( Objects.requireNonNull(binding.groupsMessagesListOfUsers.getAdapter()).getItemCount());
             }
 
             @Override
@@ -291,7 +301,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
             }
         });
-        updateUserStatus("online");
     }
 
     private void initializeFields() {
