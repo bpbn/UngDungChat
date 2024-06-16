@@ -263,6 +263,10 @@ public class ProfileActivity extends AppCompatActivity {
                                             }
                                         }
                                     });
+                            RootRef.child("Messages").child(senderUserID).child(receiverUserID)
+                                    .removeValue();
+                            RootRef.child("Messages").child(receiverUserID).child(senderUserID)
+                                    .removeValue();
                         }
                     }
                 });
